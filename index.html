@@ -90,13 +90,39 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
   background:repeating-linear-gradient(90deg,#75c6ef 0 10px,#fff 10px 20px)}
 .kit.on{box-shadow:3px 3px 0 var(--shadow);transform:rotate(-3deg)}
 .kit.off{opacity:.45}
-.pitch{position:relative;height:150px;border:3px solid var(--ink);border-radius:14px;overflow:hidden;
+.pitch{position:relative;height:220px;border:3px solid var(--ink);border-radius:14px;overflow:hidden;
   background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--lime) 75%,var(--ink)) 0 40px,color-mix(in srgb,var(--lime) 60%,var(--ink)) 40px 80px)}
-.goal{position:absolute;left:50%;top:14px;width:62%;height:80px;transform:translateX(-50%);border:5px solid #fff;border-bottom:none;
+.goal{position:absolute;left:50%;top:12px;width:62%;height:112px;transform:translateX(-50%);border:5px solid #fff;border-bottom:none;
   background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,255,255,.35) 8px 9px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,255,255,.35) 8px 9px)}
-.keeper{position:absolute;left:50%;top:44px;font-size:40px;transform:translateX(-50%);transition:left .35s,transform .35s}
-.ball{position:absolute;left:50%;bottom:8px;font-size:30px;transform:translateX(-50%);transition:all .45s cubic-bezier(.3,.7,.4,1)}
-.who{position:absolute;left:10px;bottom:8px;font-weight:800;background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:0 8px;font-size:13px}
+.keeper{position:absolute;left:50%;top:22px;transform:translateX(-50%);transition:left .35s,transform .35s;transform-origin:50% 90%}
+.shooter{position:absolute;left:16%;bottom:4px;transform:translateX(-50%)}
+.guy{width:64px;height:auto;display:block;overflow:visible}
+.potato{font-size:52px;line-height:1;display:inline-block}
+.guy .armL,.guy .armR,.guy .legR{transform-box:fill-box}
+.guy .armL{transform-origin:100% 0}.guy .armR{transform-origin:0 0}.guy .legR{transform-origin:50% 0}
+.idle{animation:bob 1.3s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.kick .legR{animation:kick .35s ease-out}
+@keyframes kick{50%{transform:rotate(-70deg)}}
+.potato.kick{animation:lean .35s}
+@keyframes lean{50%{transform:rotate(-20deg) translateX(8px)}}
+.celebrate{animation:hop .5s ease-in-out infinite}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-24px) rotate(-6deg)}}
+.celebrate .armL{animation:upL .5s ease-in-out infinite}.celebrate .armR{animation:upR .5s ease-in-out infinite}
+@keyframes upL{0%,100%{transform:rotate(120deg)}50%{transform:rotate(160deg)}}
+@keyframes upR{0%,100%{transform:rotate(-120deg)}50%{transform:rotate(-160deg)}}
+.dance{animation:shimmy .4s ease-in-out infinite}
+@keyframes shimmy{0%,100%{transform:translateX(-7px) rotate(-9deg)}50%{transform:translateX(7px) rotate(9deg) translateY(-6px)}}
+.dance .armL{animation:pumpL .4s ease-in-out infinite}.dance .armR{animation:pumpR .4s ease-in-out infinite}
+@keyframes pumpL{0%,100%{transform:rotate(40deg)}50%{transform:rotate(150deg)}}
+@keyframes pumpR{0%,100%{transform:rotate(-150deg)}50%{transform:rotate(-40deg)}}
+.sad{animation:slump .6s forwards}
+@keyframes slump{to{transform:translateY(6px) rotate(10deg) scaleY(.93)}}
+.duo{display:flex;gap:6px;align-items:flex-end}
+.tile .duo .guy{width:46px}
+.end .duo .guy{width:90px}
+.ball{position:absolute;left:30%;bottom:6px;font-size:28px;transform:translateX(-50%);transition:all .45s cubic-bezier(.3,.7,.4,1)}
+.who{position:absolute;right:10px;bottom:8px;max-width:45%;font-weight:800;background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:0 8px;font-size:13px}
 .dots{display:flex;gap:4px;font-size:16px}
 .q{font-size:19px;font-weight:800;margin:0}
 .choices{display:grid;gap:10px}
@@ -159,7 +185,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <p>Pick a game. Every right answer earns XP. Wrong answers earn nothing, but you still learn the thing, which is secretly the point.</p>
     <div class="tiles">
       <button class="tile sticker" data-go="flash"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Think of the answer FIRST, then flip. No peeking, no cheating, no llamas.</p></button>
-      <button class="tile sticker" data-go="boss"><span class="big">⚽</span><h3>Penalty Shootout</h3><p>Messi shoots, Dibu saves. Answer right to score (and to stop Inertia FC from scoring).</p></button>
+      <button class="tile sticker" data-go="boss"><span class="duo" id="tileduo"></span><h3>Penalty Shootout</h3><p>Messi shoots, Dibu saves. Answer right to score (and to stop Inertia FC from scoring).</p></button>
       <button class="tile sticker" data-go="coaster"><span class="big">🎢</span><h3>Roller Coaster Lab</h3><p>Drag the cart around and watch potential energy turn into kinetic energy.</p></button>
       <button class="tile sticker" data-go="power"><span class="big">⚡</span><h3>Power-Ups</h3><p>Every formula and unit on one cheat sheet. Look, then go test yourself.</p></button>
     </div>
@@ -322,6 +348,51 @@ const QS=[
 ["Which one is an INDIRECT interaction?",["Kicking a ball","Two cars colliding","A magnet pulling a paperclip","Pushing a door"],2,"Magnetism and gravity work without touching. Kicks, pushes and collisions are direct."],
 ["What's the difference between speed and velocity?",["No difference","Velocity includes direction","Speed includes direction","Velocity is always faster"],1,"Velocity = speed + direction."],
 ];
+/* cartoon players (caricatures, hand-drawn SVG) */
+const INK="#1d1a2e";
+const svgDefs=`<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<pattern id="argStripes" width="14" height="10" patternUnits="userSpaceOnUse"><rect width="7" height="10" fill="#75c6ef"/><rect x="7" width="7" height="10" fill="#fff"/></pattern></defs></svg>`;
+document.body.insertAdjacentHTML("beforeend",svgDefs);
+function messi(cls="idle"){const sk="#e9b38a",hair="#5a3a22",beard="#4a2f1c";return `<svg class="guy ${cls}" viewBox="0 0 100 150" aria-hidden="true">
+<g class="legL"><rect x="38" y="112" width="10" height="26" rx="4" fill="#fff" stroke="${INK}" stroke-width="2"/><rect x="33" y="134" width="16" height="8" rx="4" fill="${INK}"/></g>
+<g class="legR"><rect x="53" y="112" width="10" height="26" rx="4" fill="#fff" stroke="${INK}" stroke-width="2"/><rect x="53" y="134" width="16" height="8" rx="4" fill="#ff5d8f" stroke="${INK}" stroke-width="2"/></g>
+<path d="M33 98h34v18H53l-3-5-3 5H33z" fill="${INK}"/>
+<g class="armL"><rect x="19" y="68" width="11" height="26" rx="5" fill="url(#argStripes)" stroke="${INK}" stroke-width="2"/><circle cx="24.5" cy="97" r="5.5" fill="${sk}" stroke="${INK}" stroke-width="2"/></g>
+<g class="armR"><rect x="70" y="68" width="11" height="26" rx="5" fill="url(#argStripes)" stroke="${INK}" stroke-width="2"/><circle cx="75.5" cy="97" r="5.5" fill="${sk}" stroke="${INK}" stroke-width="2"/></g>
+<rect x="29" y="64" width="42" height="38" rx="9" fill="url(#argStripes)" stroke="${INK}" stroke-width="2.5"/>
+<text x="50" y="92" font-size="16" font-family="Lilita One,Arial Rounded MT Bold,sans-serif" text-anchor="middle" fill="${INK}">10</text>
+<circle cx="23" cy="40" r="5" fill="${sk}" stroke="${INK}" stroke-width="2"/><circle cx="77" cy="40" r="5" fill="${sk}" stroke="${INK}" stroke-width="2"/>
+<circle cx="50" cy="38" r="27" fill="${sk}" stroke="${INK}" stroke-width="2.5"/>
+<path d="M23 36Q22 9 50 9Q78 9 77 36Q70 21 52 22Q36 21 23 36z" fill="${hair}" stroke="${INK}" stroke-width="2"/>
+<path d="M24 42Q27 68 50 68Q73 68 76 42Q71 52 62 52Q50 47 38 52Q29 52 24 42z" fill="${beard}"/>
+<path d="M41 55Q50 63 59 55Z" fill="#fff" stroke="${INK}" stroke-width="1.5"/>
+<path d="M34 29l9 2M66 29l-9 2" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="40" cy="37" rx="3.5" ry="4.5" fill="${INK}"/><ellipse cx="60" cy="37" rx="3.5" ry="4.5" fill="${INK}"/>
+<circle cx="41" cy="35.5" r="1.2" fill="#fff"/><circle cx="61" cy="35.5" r="1.2" fill="#fff"/>
+<path d="M50 39q4 6-1 8" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>`}
+function dibu(cls="idle"){const sk="#f0c19b",hair="#2b211c",kit="#d7f23a";return `<svg class="guy ${cls}" viewBox="0 0 100 150" aria-hidden="true">
+<g class="legL"><rect x="37" y="108" width="11" height="32" rx="4" fill="${kit}" stroke="${INK}" stroke-width="2"/><rect x="31" y="136" width="18" height="8" rx="4" fill="${INK}"/></g>
+<g class="legR"><rect x="53" y="108" width="11" height="32" rx="4" fill="${kit}" stroke="${INK}" stroke-width="2"/><rect x="53" y="136" width="18" height="8" rx="4" fill="${INK}"/></g>
+<path d="M32 94h36v18H53l-3-5-3 5H32z" fill="${INK}"/>
+<g class="armL"><rect x="16" y="62" width="12" height="28" rx="6" fill="${kit}" stroke="${INK}" stroke-width="2"/><rect x="13" y="86" width="18" height="6" rx="2" fill="#3bd16f" stroke="${INK}" stroke-width="2"/><circle cx="22" cy="99" r="10" fill="#fff" stroke="${INK}" stroke-width="2.5"/><path d="M17 95v6M22 94v7M27 95v6" stroke="${INK}" stroke-width="1.5"/></g>
+<g class="armR"><rect x="72" y="62" width="12" height="28" rx="6" fill="${kit}" stroke="${INK}" stroke-width="2"/><rect x="69" y="86" width="18" height="6" rx="2" fill="#3bd16f" stroke="${INK}" stroke-width="2"/><circle cx="78" cy="99" r="10" fill="#fff" stroke="${INK}" stroke-width="2.5"/><path d="M73 95v6M78 94v7M83 95v6" stroke="${INK}" stroke-width="1.5"/></g>
+<rect x="27" y="58" width="46" height="40" rx="10" fill="${kit}" stroke="${INK}" stroke-width="2.5"/>
+<path d="M27 70h46" stroke="#3bd16f" stroke-width="4"/>
+<text x="50" y="91" font-size="16" font-family="Lilita One,Arial Rounded MT Bold,sans-serif" text-anchor="middle" fill="${INK}">23</text>
+<circle cx="25" cy="34" r="5" fill="${sk}" stroke="${INK}" stroke-width="2"/><circle cx="75" cy="34" r="5" fill="${sk}" stroke="${INK}" stroke-width="2"/>
+<rect x="26" y="8" width="48" height="52" rx="22" fill="${sk}" stroke="${INK}" stroke-width="2.5"/>
+<path d="M26 26Q26 6 50 6Q74 6 74 26Q74 16 50 16Q26 16 26 26z" fill="${hair}" stroke="${INK}" stroke-width="2"/>
+<path d="M28 36Q30 60 50 60Q70 60 72 36Q66 46 50 46Q34 46 28 36z" fill="${hair}" opacity=".45"/>
+<path d="M34 22l9-3M66 22l-9-3" stroke="${INK}" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="41" cy="30" rx="3.5" ry="4.5" fill="${INK}"/><ellipse cx="59" cy="30" rx="3.5" ry="4.5" fill="${INK}"/>
+<circle cx="42" cy="28.5" r="1.2" fill="#fff"/><circle cx="60" cy="28.5" r="1.2" fill="#fff"/>
+<path d="M50 32q4 5-1 7" stroke="${INK}" stroke-width="2" fill="none" stroke-linecap="round"/>
+<path d="M37 44Q50 58 63 44Z" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M47 50q3 6 7 0" fill="#ff5d8f"/>
+</svg>`}
+const potato=(cls="idle")=>`<span class="potato ${cls}" aria-hidden="true">🥔</span>`;
+$("#tileduo").innerHTML=messi()+dibu();
+
 const GOAL=["GOOOOL! Messi, left foot, top corner. The keeper didn't even move (inertia).","Messi dribbles past four potatoes and taps it in.","GOAL! That ball had a LOT of kinetic energy.","Messi chips it. Pure art. Pure physics."];
 const MISS=["Saved! The Inertia FC keeper is a very large potato.","Off the post! Read the why and fix the aim.","Over the bar. Into orbit. Ask DART to go get it."];
 const SAVE=["DIBU SAVES IT! Then does a little dance.","Dibu dives! Equal and opposite reaction on that glove.","NOT TODAY. Dibu stops it and stares the striker down.","Dibu blocks it with his face. He's fine. He's Dibu."];
@@ -336,7 +407,7 @@ function bossTurn(){
   const tag=rd>=ROUNDS?"SUDDEN DEATH":`Kick ${pairs+1} of ${ROUNDS/2}`;
   B.innerHTML=`<div class="score"><div class="kits"><span class="kit ${atk?"on":"off"}">Messi 10</span><span class="kit ${atk?"off":"on"}">Dibu 23</span></div>
     <div class="board"><small>Remi</small>${us}<span>–</span>${them}<small>Inertia FC</small></div><span>${tag}</span></div>
-    <div class="pitch" aria-hidden="true"><div class="goal"></div><span class="keeper" id="kp">${atk?"🥔":"🧤"}</span><span class="ball" id="ball">⚽</span><span class="who">${atk?"Messi is shooting. Answer right to score!":"Inertia FC is shooting. Answer right so Dibu saves it!"}</span></div>
+    <div class="pitch" aria-hidden="true"><div class="goal"></div><div class="keeper" id="kp">${atk?potato():dibu()}</div><div class="shooter" id="sh">${atk?messi():potato()}</div><span class="ball" id="ball">⚽</span><span class="who">${atk?"Messi is shooting. Answer right to score!":"Inertia FC is shooting. Answer right so Dibu saves it!"}</span></div>
     <div class="dots" aria-label="Shot history">${log.join("")}</div>
     <p class="q">${q}</p><div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${ch[i]}</button>`).join("")}</div><div id="after"></div>`;
   B.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{
@@ -345,8 +416,17 @@ function bossTurn(){
     if(!ok)btn.classList.add("wrong");
     const side=Math.random()<.5?-1:1,ball=$("#ball"),kp=$("#kp");
     const scored=atk?ok:!ok;
-    ball.style.bottom="78px";ball.style.left=scored?`${50+side*22}%`:`${50+side*14}%`;ball.style.fontSize="22px";
-    kp.style.left=scored?`${50-side*20}%`:`${50+side*14}%`;kp.style.transform=`translateX(-50%) rotate(${scored?-side*70:side*20}deg)`;
+    const sh=$("#sh").firstElementChild,kpi=kp.firstElementChild;
+    sh.classList.remove("idle");sh.classList.add("kick");
+    setTimeout(()=>{
+      ball.style.bottom=scored?"150px":"120px";ball.style.left=scored?`${50+side*22}%`:`${50+side*12}%`;ball.style.fontSize="20px";
+      kp.style.left=scored?`${50-side*20}%`:`${50+side*12}%`;if(scored)kp.style.transform=`translateX(-50%) rotate(${-side*70}deg)`;
+    },220);
+    setTimeout(()=>{
+      sh.classList.remove("kick");kpi.classList.remove("idle");
+      if(scored){sh.classList.add("celebrate");kpi.classList.add("sad")}
+      else{kpi.classList.add(atk?"celebrate":"dance");sh.classList.add("sad")}
+    },700);
     if(atk&&ok){us++;addXP(10)} if(!atk&&ok){addXP(10)} if(!atk&&!ok)them++;
     log.push(atk?(ok?"⚽":"❌"):(ok?"🧤":"😩"));
     bi++;rd++;
@@ -358,7 +438,7 @@ function bossTurn(){
 }
 function bossEnd(){
   const won=us>them;
-  $("#bossbody").innerHTML=`<div class="end"><span class="big">${won?"🏆":"🥔"}</span>
+  $("#bossbody").innerHTML=`<div class="end"><div class="duo">${won?messi("celebrate")+'<span class="potato">🏆</span>'+dibu("dance"):messi("sad")+potato("celebrate")+dibu("sad")}</div>
     <h3 style="font-size:30px">${won?`Remi wins ${us}–${them}! Messi lifts the trophy, Dibu does the dance.`:`Inertia FC wins ${them}–${us}. The potatoes are insufferable.`}</h3>
     <p style="margin:0;font-weight:700">${won?"+50 XP bonus. Champions of physics.":"Every miss showed you the why. Read those, then demand a rematch."}</p>
     <div class="dots">${log.join("")}</div>
