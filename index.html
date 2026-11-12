@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Remi's Brain Arcade</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: sticker-arcade. Chunky outlined cards on bright paper, one column on phones. */
+:root{
+  --bg:#fff6d8; --paper:#ffffff; --ink:#1d1a2e; --muted:#5c5873;
+  --pop:#ff5d8f; --sky:#3ec7ff; --lime:#8be04e; --sun:#ffc93c; --grape:#8f6bff;
+  --good:#1fa34a; --bad:#e0384f; --shadow:#1d1a2e;
+  --display:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Nunito",ui-rounded,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1b1830; --paper:#2a2645; --ink:#f5f1ff; --muted:#b7b0d6;
+  --pop:#ff77a3; --sky:#4fd0ff; --lime:#9ef060; --sun:#ffd257; --grape:#a98cff;
+  --good:#4ee07c; --bad:#ff6b7f; --shadow:#000; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1830; --paper:#2a2645; --ink:#f5f1ff; --muted:#b7b0d6;
+  --pop:#ff77a3; --sky:#4fd0ff; --lime:#9ef060; --sun:#ffd257; --grape:#a98cff;
+  --good:#4ee07c; --bad:#ff6b7f; --shadow:#000; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(color-mix(in srgb,var(--ink) 9%,transparent) 1.5px,transparent 1.5px);background-size:22px 22px}
+.wrap{max-width:960px;margin:0 auto;padding-block:20px 60px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.5px}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline-offset:3px}
+.sticker{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 5px 0 var(--shadow)}
+.btn{background:var(--sun);border:3px solid var(--ink);border-radius:14px;padding:10px 18px;font-weight:800;box-shadow:3px 3px 0 var(--shadow);transition:transform .08s}
+.btn:active{transform:translate(3px,3px);box-shadow:none}
+.btn.alt{background:var(--paper)} .btn.pink{background:var(--pop);color:#1d1a2e} .btn.lime{background:var(--lime);color:#1d1a2e}
+.btn.sun{color:#1d1a2e}
+
+/* top bar */
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;padding:14px 18px}
+.top h1{font-size:clamp(28px,6vw,42px);line-height:1}
+.top h1 span{color:var(--pop);-webkit-text-stroke:1.5px var(--ink)}
+.xp{display:grid;gap:4px;min-width:220px;flex:1;max-width:340px}
+.xp .row{display:flex;justify-content:space-between;font-weight:800;font-size:14px}
+.bar{height:16px;border:3px solid var(--ink);border-radius:99px;background:var(--bg);overflow:hidden}
+.bar i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--lime) 0 10px,color-mix(in srgb,var(--lime) 70%,#fff) 10px 20px);transition:width .4s}
+.countdown{font-weight:800;background:var(--pop);color:#1d1a2e;border:3px solid var(--ink);border-radius:99px;padding:4px 12px;font-size:14px;transform:rotate(-2deg)}
+
+/* subject picker */
+.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.subj{padding:14px;text-align:left;display:grid;gap:2px}
+.subj b{font-family:var(--display);font-weight:400;font-size:22px}
+.subj small{color:var(--muted);font-weight:700}
+.subj[aria-pressed="true"]{background:var(--sky);color:#1d1a2e}
+.subj[aria-pressed="true"] small{color:#1d1a2e}
+.subj:disabled{cursor:not-allowed;opacity:.65;box-shadow:none;border-style:dashed}
+
+/* game tiles */
+.unit{display:grid;gap:6px}
+.unit p{margin:0;color:var(--muted);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.tile{padding:18px;text-align:left;display:grid;gap:8px;align-content:start}
+.tile .big{font-size:44px;line-height:1}
+.tile h3{font-size:24px}
+.tile p{margin:0;color:var(--muted);font-weight:700;font-size:15px}
+.tile:nth-child(1){transform:rotate(-1deg)} .tile:nth-child(2){transform:rotate(.8deg)} .tile:nth-child(3){transform:rotate(-.5deg)} .tile:nth-child(4){transform:rotate(1deg)}
+.tile:hover{transform:rotate(0) translateY(-3px)}
+
+.stage{padding:20px;display:grid;gap:16px}
+.stage-head{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.stage-head h2{font-size:30px}
+
+/* flashcards */
+.card{min-height:220px;border:3px solid var(--ink);border-radius:18px;background:var(--sky);color:#1d1a2e;display:grid;place-items:center;text-align:center;padding:24px;box-shadow:5px 5px 0 var(--shadow)}
+.card.back{background:var(--lime)}
+.card .term{font-family:var(--display);font-size:clamp(26px,5vw,38px)}
+.card .def{font-size:19px;font-weight:700;max-width:60ch}
+.card .hint{font-size:14px;font-weight:800;opacity:.75;margin-top:8px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.tally{font-weight:800;color:var(--muted);text-align:center}
+
+/* shootout */
+.score{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;font-weight:800}
+.board{display:flex;align-items:center;gap:12px;font-family:var(--display);font-size:28px;background:var(--ink);color:var(--bg);border-radius:12px;padding:6px 16px;font-variant-numeric:tabular-nums}
+.board small{font-family:var(--body);font-size:13px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.kits{display:flex;gap:6px;flex-wrap:wrap}
+.kit{border:3px solid var(--ink);border-radius:10px;padding:2px 10px;font-weight:800;font-size:14px;color:#1d1a2e;
+  background:repeating-linear-gradient(90deg,#75c6ef 0 10px,#fff 10px 20px)}
+.kit.on{box-shadow:3px 3px 0 var(--shadow);transform:rotate(-3deg)}
+.kit.off{opacity:.45}
+.pitch{position:relative;height:150px;border:3px solid var(--ink);border-radius:14px;overflow:hidden;
+  background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--lime) 75%,var(--ink)) 0 40px,color-mix(in srgb,var(--lime) 60%,var(--ink)) 40px 80px)}
+.goal{position:absolute;left:50%;top:14px;width:62%;height:80px;transform:translateX(-50%);border:5px solid #fff;border-bottom:none;
+  background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(255,255,255,.35) 8px 9px),repeating-linear-gradient(-45deg,transparent 0 8px,rgba(255,255,255,.35) 8px 9px)}
+.keeper{position:absolute;left:50%;top:44px;font-size:40px;transform:translateX(-50%);transition:left .35s,transform .35s}
+.ball{position:absolute;left:50%;bottom:8px;font-size:30px;transform:translateX(-50%);transition:all .45s cubic-bezier(.3,.7,.4,1)}
+.who{position:absolute;left:10px;bottom:8px;font-weight:800;background:var(--paper);border:2px solid var(--ink);border-radius:8px;padding:0 8px;font-size:13px}
+.dots{display:flex;gap:4px;font-size:16px}
+.q{font-size:19px;font-weight:800;margin:0}
+.choices{display:grid;gap:10px}
+.choice{text-align:left;background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px 14px;font-weight:700;box-shadow:3px 3px 0 var(--shadow)}
+.choice.right{background:var(--good);color:#fff}
+.choice.wrong{background:var(--bad);color:#fff}
+.explain{border-left:6px solid var(--grape);padding:10px 14px;background:color-mix(in srgb,var(--grape) 14%,var(--paper));border-radius:0 12px 12px 0;font-weight:700}
+.explain b{font-family:var(--display);font-weight:400;font-size:20px;display:block}
+.end{text-align:center;display:grid;gap:12px;justify-items:center}
+.end .big{font-size:80px}
+
+/* coaster */
+.coaster canvas{width:100%;height:auto;aspect-ratio:2/1;max-width:100%;border:3px solid var(--ink);border-radius:14px;background:var(--bg)}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.meter{padding:12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);display:grid;gap:6px}
+.meter b{font-family:var(--display);font-weight:400;font-size:18px}
+.meter .num{font-variant-numeric:tabular-nums;font-weight:800;font-size:20px}
+.meter.pe .bar i{background:var(--grape)} .meter.ke .bar i{background:var(--pop)}
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-weight:800}
+.sliders label{display:grid;gap:4px}
+input[type=range]{width:100%;accent-color:var(--pop)}
+.callout{font-weight:800;text-align:center;font-size:18px;min-height:1.5em}
+
+/* power-ups */
+.powerups{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.pu{padding:14px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);display:grid;gap:4px}
+.pu h3{font-size:20px}
+.pu code{font-family:var(--body);font-weight:800;font-size:20px;background:var(--sun);color:#1d1a2e;padding:2px 8px;border-radius:8px;justify-self:start}
+.pu p{margin:0;font-weight:600}
+.units{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;font-weight:700}
+.units span b{font-family:var(--display);font-weight:400}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-2deg);background:var(--lime);color:#1d1a2e;border:3px solid var(--ink);border-radius:14px;padding:10px 18px;font-weight:800;box-shadow:4px 4px 0 var(--shadow);z-index:20;max-width:calc(100% - 32px);text-align:center}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:520px){.arena{grid-template-columns:1fr;justify-items:center}.boss{font-size:60px}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top sticker">
+    <h1>Remi's <span>Brain</span> Arcade</h1>
+    <div class="xp" aria-live="polite">
+      <div class="row"><span id="rank">Couch Potato</span><span id="xpnum">0 XP</span></div>
+      <div class="bar"><i id="xpbar" style="width:0%"></i></div>
+    </div>
+    <span class="countdown" id="countdown">Science test: Fri Nov 13</span>
+  </header>
+
+  <nav class="subjects" aria-label="Subjects">
+    <button class="subj sticker" aria-pressed="true"><b>Science</b><small>Unit 1: Forces &amp; Energy</small></button>
+    <button class="subj sticker" disabled><b>Math</b><small>Squirrels still building this level</small></button>
+    <button class="subj sticker" disabled><b>ELA</b><small>Coming soon</small></button>
+    <button class="subj sticker" disabled><b>Social Studies</b><small>Coming soon</small></button>
+  </nav>
+
+  <section id="menu" class="unit">
+    <h2 style="font-size:30px">Newton's Playground</h2>
+    <p>Pick a game. Every right answer earns XP. Wrong answers earn nothing, but you still learn the thing, which is secretly the point.</p>
+    <div class="tiles">
+      <button class="tile sticker" data-go="flash"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Think of the answer FIRST, then flip. No peeking, no cheating, no llamas.</p></button>
+      <button class="tile sticker" data-go="boss"><span class="big">⚽</span><h3>Penalty Shootout</h3><p>Messi shoots, Dibu saves. Answer right to score (and to stop Inertia FC from scoring).</p></button>
+      <button class="tile sticker" data-go="coaster"><span class="big">🎢</span><h3>Roller Coaster Lab</h3><p>Drag the cart around and watch potential energy turn into kinetic energy.</p></button>
+      <button class="tile sticker" data-go="power"><span class="big">⚡</span><h3>Power-Ups</h3><p>Every formula and unit on one cheat sheet. Look, then go test yourself.</p></button>
+    </div>
+  </section>
+
+  <!-- FLASHCARDS -->
+  <section id="flash" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Brain Flex Cards</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <div class="card" id="fcard" aria-live="polite"></div>
+    <div class="controls" id="fctrl"></div>
+    <div class="tally" id="ftally"></div>
+  </section>
+
+  <!-- BOSS -->
+  <section id="boss" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Penalty Shootout</h2><button class="btn alt" data-go="menu">Leave the stadium</button></div>
+    <div id="bossbody"></div>
+  </section>
+
+  <!-- COASTER -->
+  <section id="coaster" class="stage sticker coaster" hidden>
+    <div class="stage-head"><h2>Roller Coaster Lab</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <canvas id="cv" width="800" height="400" aria-label="Roller coaster track with a cart"></canvas>
+    <div class="sliders">
+      <label for="pos">Cart position<input id="pos" type="range" min="0" max="1000" value="0"></label>
+      <label for="mass">Cart mass: <span id="massv">200</span> kg<input id="mass" type="range" min="50" max="500" step="50" value="200"></label>
+    </div>
+    <div class="controls"><button class="btn lime" id="play">Let it rip!</button></div>
+    <div class="meters">
+      <div class="meter"><b>Height</b><span class="num" id="hv">20.0 m</span></div>
+      <div class="meter"><b>Speed</b><span class="num" id="vv">0.0 m/s</span></div>
+      <div class="meter pe"><b>Potential energy (stored)</b><span class="num" id="pev">0 J</span><div class="bar"><i id="peb"></i></div></div>
+      <div class="meter ke"><b>Kinetic energy (motion)</b><span class="num" id="kev">0 J</span><div class="bar"><i id="keb"></i></div></div>
+    </div>
+    <div class="callout" id="callout"></div>
+    <p style="margin:0;color:var(--muted);font-weight:700">No friction here, so the total never changes: whatever PE loses, KE gains. Try a bigger mass: both bars hold more joules, because mass is in both formulas.</p>
+  </section>
+
+  <!-- POWER-UPS -->
+  <section id="power" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Power-Ups</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <div class="powerups">
+      <div class="pu"><h3>Newton's 1st Law</h3><p>At rest stays at rest. Moving keeps moving (same speed, same direction) unless an outside force acts. That laziness is called <b>inertia</b>.</p></div>
+      <div class="pu"><h3>Newton's 2nd Law</h3><code>F = m × a</code><p>More force means more acceleration. More mass means you NEED more force.</p></div>
+      <div class="pu"><h3>Newton's 3rd Law</h3><p>Every action has an equal and opposite reaction. Two objects, same size forces, opposite directions, at the same time. Smaller mass gets the bigger change in motion.</p></div>
+      <div class="pu"><h3>Momentum</h3><code>p = m × v</code><p>Mass in motion, in kg·m/s.</p></div>
+      <div class="pu"><h3>Kinetic energy</h3><code>KE = ½ × m × v²</code><p>Energy of motion. Double the mass, 2× KE. Double the speed, 4× KE (speed is squared).</p></div>
+      <div class="pu"><h3>Potential energy</h3><code>PE = m × g × h</code><p>Stored energy. g = 9.8 m/s² always. Double the height, 2× PE.</p></div>
+      <div class="pu"><h3>Net force</h3><p>Same direction: add. Opposite directions: subtract, and it points toward the bigger one. 5 N → and ← 3 N gives 2 N →. Zero net force = balanced = no change in motion.</p></div>
+      <div class="pu"><h3>Force crew</h3><p><b>Gravity</b> pulls down. <b>Friction</b> fights motion. <b>Spring scale</b> measures force in newtons.</p></div>
+    </div>
+    <div class="pu"><h3>Units cheat code</h3>
+      <div class="units"><span><b>Force</b> N (newtons)</span><span><b>Mass</b> kg</span><span><b>Velocity</b> m/s</span><span><b>Acceleration</b> m/s²</span><span><b>Energy</b> J (joules)</span><span><b>Distance</b> m</span><span><b>Momentum</b> kg·m/s</span><span><b>g</b> 9.8 m/s²</span></div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden></div>
+<canvas class="confetti" id="conf" hidden></canvas>
+
+<script>
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.random()*a.length|0];
+
+/* ---------- XP ---------- */
+const RANKS=[[0,"Bench Potato (at rest)"],[50,"Ball Kid"],[150,"Super Sub"],[300,"Starting XI"],[500,"Captain's Armband"],[800,"The GOAT"]];
+let xp=0; try{xp=+localStorage.getItem("remi-xp")||0}catch(e){}
+function addXP(n){xp+=n;try{localStorage.setItem("remi-xp",xp)}catch(e){}drawXP()}
+function drawXP(){
+  let i=RANKS.length-1;while(xp<RANKS[i][0])i--;
+  const lo=RANKS[i][0],hi=(RANKS[i+1]||[lo+500])[0];
+  $("#rank").textContent=RANKS[i][1];$("#xpnum").textContent=xp+" XP";
+  $("#xpbar").style.width=Math.min(100,(xp-lo)/(hi-lo)*100)+"%";
+}
+drawXP();
+(function(){const d=Math.ceil((new Date(2026,10,13)-new Date().setHours(0,0,0,0))/864e5);
+  $("#countdown").textContent=d>1?`Science test in ${d} days`:d===1?"Science test: TOMORROW":d===0?"Science test: TODAY. You got this":"Science test: done!";})();
+
+let toastT;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,1800)}
+
+/* ---------- nav ---------- */
+const views=["menu","flash","boss","coaster","power"];
+function go(v){views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go)});
+
+/* ---------- flashcards ---------- */
+const CARDS=[
+["Inertia","An object's tendency to resist changes in motion: it wants to stay at rest or keep moving the same way."],
+["Newton's 1st Law","An object at rest stays at rest and an object in motion stays in motion, unless acted on by an outside force."],
+["Newton's 2nd Law","Force = mass × acceleration. More force means more acceleration; more mass means you need more force."],
+["Newton's 3rd Law","For every action there is an equal and opposite reaction. Forces come in pairs between two objects."],
+["Force","A push or a pull. Measured in newtons (N)."],
+["Net force","The total of all forces on an object. Same direction: add. Opposite: subtract."],
+["Balanced forces","Net force is zero, so the object's motion does not change."],
+["Unbalanced forces","Net force is not zero, so the object speeds up, slows down, or changes direction (toward the net force)."],
+["Gravity","A force that pulls objects toward each other. On Earth it pulls down; g = 9.8 m/s²."],
+["Friction","A force between touching surfaces that opposes motion."],
+["Action-reaction pair","Two equal, opposite forces between two interacting objects at the same time. Example: your foot pushes the ball, the ball pushes your foot."],
+["Direct vs. indirect interaction","Direct: touching (push, pull, collision). Indirect: no touching needed (gravity, magnetism)."],
+["Spring scale","A tool that measures force in newtons."],
+["Speed vs. velocity","Speed is how fast. Velocity is how fast AND which direction."],
+["Acceleration","How fast velocity changes. Units: m/s²."],
+["Momentum","p = mass × velocity. Units: kg·m/s."],
+["Kinetic energy","Energy of motion. KE = ½ × m × v², in joules (J)."],
+["Potential energy","Stored energy from position. PE = m × g × h, in joules (J)."],
+["What changes KE?","Mass and speed. Double the mass → 2× KE. Double the speed → 4× KE (speed is squared)."],
+["What changes PE?","Mass and height (g stays 9.8). Double the height → 2× PE."],
+["Roller coaster: where is PE highest?","At the top of the tallest hill. That's also where KE is lowest."],
+["Roller coaster: where is KE highest?","At the bottom of the biggest drop, where it's fastest. That's where PE is lowest."],
+["Units roll call","Force N · mass kg · velocity m/s · acceleration m/s² · energy J · distance m."],
+];
+let deck,fi,fFlipped,fGot,fMiss;
+function startFlash(){deck=shuffle(CARDS);fi=0;fGot=0;fMiss=[];showCard(false)}
+function showCard(back){
+  fFlipped=back;const c=$("#fcard"),ctl=$("#fctrl");
+  if(fi>=deck.length){
+    c.className="card back";
+    c.innerHTML=`<div><div class="term">Deck cleared!</div><div class="def">${fGot} of ${deck.length} nailed. ${fMiss.length?`Missed ${fMiss.length}. Run those again until they stick.`:"Flawless. Suspiciously flawless."}</div></div>`;
+    ctl.innerHTML=(fMiss.length?`<button class="btn pink" id="again">Redo the ${fMiss.length} I missed</button>`:"")+`<button class="btn alt" id="fresh">Shuffle full deck</button>`;
+    $("#again")&&($("#again").onclick=()=>{deck=shuffle(fMiss);fi=0;fGot=0;fMiss=[];showCard(false)});
+    $("#fresh").onclick=startFlash;$("#ftally").textContent="";return;
+  }
+  const [t,d]=deck[fi];
+  if(!back){
+    c.className="card";c.innerHTML=`<div><div class="term">${t}</div><div class="hint">Say the answer out loud first. Your brain is a muscle. Flex it.</div></div>`;
+    ctl.innerHTML=`<button class="btn sun" id="flip">Flip it</button>`;$("#flip").onclick=()=>showCard(true);
+  }else{
+    c.className="card back";c.innerHTML=`<div><div class="term" style="font-size:22px">${t}</div><div class="def">${d}</div></div>`;
+    ctl.innerHTML=`<button class="btn lime" id="yes">Nailed it (+5 XP)</button><button class="btn pink" id="no">Nope, again later</button>`;
+    $("#yes").onclick=()=>{fGot++;addXP(5);fi++;showCard(false)};
+    $("#no").onclick=()=>{fMiss.push(deck[fi]);fi++;showCard(false)};
+  }
+  $("#ftally").textContent=`Card ${fi+1} of ${deck.length}`;
+}
+
+/* ---------- boss ---------- */
+const QS=[
+["A block has 5 N pushing right and 3 N pushing left. What's the net force?",["8 N right","2 N right","2 N left","0 N, they cancel"],1,"Opposite directions, so subtract: 5 − 3 = 2 N, pointing toward the bigger push (right)."],
+["DART and a heavier spacecraft both hit the asteroid Dimorphos with the same acceleration. Which exerts more force?",["DART, because it's smaller","Same force, same acceleration","Can't tell","The heavier spacecraft"],3,"F = m × a. Same a, bigger m, bigger F."],
+["The spacecraft smashes into Dimorphos. Which one has the bigger change in motion?",["Dimorphos, it got hit","The spacecraft: equal forces, but it has way less mass","Same change, the forces are equal","Neither moves"],1,"3rd law: the forces are equal and opposite. But the same force on a smaller mass gives a bigger acceleration (2nd law)."],
+["Why can't a spacecraft crash into an asteroid and then hang out to study it?",["The forces cancel out","The asteroid pushes back on the spacecraft with an equal force and wrecks it","The asteroid absorbs all the force","The forces point the same way"],1,"Action-reaction: the spacecraft pushes the asteroid, the asteroid pushes the spacecraft back just as hard."],
+["DART didn't move Dimorphos enough. What change would push it more?",["Make the spacecraft lighter and slower","Make the spacecraft heavier or faster","Paint it red","Hit it more gently"],1,"More mass or more speed means more force/momentum delivered, so the asteroid gets a bigger push. On the free-response, also define the 3rd law!"],
+["A roller coaster gets heavier. What happens going up a hill?",["It goes up faster","It takes less time","Mass doesn't matter","It needs more force to get pulled up"],3,"2nd law: more mass needs more force for the same acceleration."],
+["In the cart investigation, what happened as the cart's mass went up?",["It stopped sooner","It traveled farther before stopping","No change","Can't tell"],1,"Heavier moving cart = more momentum and more KE, so it takes longer to stop."],
+["Mass stays the same but speed goes up. Kinetic energy...",["goes up","goes down","stays the same","goes down then up"],0,"KE = ½mv². More v, more KE."],
+["A wrecking ball with TWICE the mass swings at the same speed. Its KE is...",["quadrupled","doubled","halved","the same"],1,"Mass isn't squared, so 2× mass = 2× KE. (Quadrupled is the trap answer, that's for doubling SPEED.)"],
+["Same wrecking ball, but now it goes TWICE as fast. Its KE is...",["doubled","the same","quadrupled","halved"],2,"Speed is squared: 2² = 4, so KE is 4×."],
+["A 5 kg drone starts at rest. A net 20 N upward force acts for 4 s. What's its momentum at the end?",["20 kg·m/s","80 kg·m/s","100 kg·m/s","16 kg·m/s"],1,"a = F/m = 20/5 = 4 m/s². After 4 s, v = 4 × 4 = 16 m/s. p = m × v = 5 × 16 = 80 kg·m/s."],
+["A 1,000 kg car has momentum 20,000 kg·m/s and brakes to a stop in 4 s. Braking force?",["20,000 N","80,000 N","5,000 N","500 N"],2,"v = p/m = 20 m/s. It loses 20 m/s in 4 s, so a = 5 m/s². F = m × a = 1000 × 5 = 5,000 N."],
+["A 2 kg book sits on a 5 m high shelf. Its PE? (g = 9.8)",["10 J","98 J","49 J","19.6 J"],1,"PE = m × g × h = 2 × 9.8 × 5 = 98 J."],
+["A 4 kg ball rolls at 3 m/s. Its KE?",["12 J","36 J","6 J","18 J"],3,"KE = ½ × 4 × 3² = ½ × 4 × 9 = 18 J."],
+["Where on a roller coaster is KE the highest?",["Top of the tallest hill","Bottom of the biggest drop","At the start, before it moves","Exactly halfway up"],1,"Lowest point = PE turned into the most motion = fastest = most KE."],
+["Force is measured in...",["joules","kilograms","newtons","m/s²"],2,"Newtons (N). Joules are for energy."],
+["What's a spring scale for?",["Measuring mass in kg","Measuring force in newtons","Measuring speed","Weighing springs"],1,"It stretches more under a bigger pull, and shows the force in newtons."],
+["An astronaut on the ISS throws a bag forward. What happens to the astronaut?",["Nothing","Drifts forward with the bag","Drifts backward","Spins forever"],2,"3rd law: the bag pushes back on the astronaut, so they float the opposite way."],
+["A ball rolling on grass slows down and stops. Why?",["It ran out of force","Friction is an unbalanced force acting against it","Gravity pushed it backward","Inertia stopped it"],1,"Objects don't 'run out' of force. Friction acts against the motion until it stops (1st law)."],
+["A hockey puck slides on perfectly frictionless ice. What does it do?",["Slows down eventually","Keeps going same speed, same direction","Speeds up","Stops right away"],1,"No outside force, no change in motion. That's Newton's 1st law."],
+["Which is an action-reaction pair?",["Hammer pushes nail; nail pushes hammer","Gravity pulls book down; table pushes book up","Friction and air resistance","Two kids pushing the same box"],0,"Action-reaction pairs are between TWO objects pushing on EACH OTHER. The book/table one is two forces on the same object, so it's not a pair."],
+["A 10 kg cart accelerates at 2 m/s². What's the net force?",["5 N","12 N","20 N","8 N"],2,"F = m × a = 10 × 2 = 20 N."],
+["Which one is an INDIRECT interaction?",["Kicking a ball","Two cars colliding","A magnet pulling a paperclip","Pushing a door"],2,"Magnetism and gravity work without touching. Kicks, pushes and collisions are direct."],
+["What's the difference between speed and velocity?",["No difference","Velocity includes direction","Speed includes direction","Velocity is always faster"],1,"Velocity = speed + direction."],
+];
+const GOAL=["GOOOOL! Messi, left foot, top corner. The keeper didn't even move (inertia).","Messi dribbles past four potatoes and taps it in.","GOAL! That ball had a LOT of kinetic energy.","Messi chips it. Pure art. Pure physics."];
+const MISS=["Saved! The Inertia FC keeper is a very large potato.","Off the post! Read the why and fix the aim.","Over the bar. Into orbit. Ask DART to go get it."];
+const SAVE=["DIBU SAVES IT! Then does a little dance.","Dibu dives! Equal and opposite reaction on that glove.","NOT TODAY. Dibu stops it and stares the striker down.","Dibu blocks it with his face. He's fine. He's Dibu."];
+const CONCEDE=["Inertia FC scores. A potato is celebrating. Gross.","Dibu went the wrong way. Read the why for the rematch.","Goal for the potatoes. Unacceptable. Revenge time."];
+const ROUNDS=10;let bq,bi,rd,us,them,log;
+function startBoss(){bq=shuffle(QS);bi=0;rd=0;us=0;them=0;log=[];bossTurn()}
+function bossTurn(){
+  const B=$("#bossbody"),pairs=Math.floor(rd/2);
+  if(rd>=ROUNDS&&rd%2===0&&us!==them)return bossEnd();
+  if(bi>=bq.length){bq=bq.concat(shuffle(QS));}
+  const atk=rd%2===0,[q,ch,ans,why]=bq[bi],order=shuffle(ch.map((c,i)=>i));
+  const tag=rd>=ROUNDS?"SUDDEN DEATH":`Kick ${pairs+1} of ${ROUNDS/2}`;
+  B.innerHTML=`<div class="score"><div class="kits"><span class="kit ${atk?"on":"off"}">Messi 10</span><span class="kit ${atk?"off":"on"}">Dibu 23</span></div>
+    <div class="board"><small>Remi</small>${us}<span>–</span>${them}<small>Inertia FC</small></div><span>${tag}</span></div>
+    <div class="pitch" aria-hidden="true"><div class="goal"></div><span class="keeper" id="kp">${atk?"🥔":"🧤"}</span><span class="ball" id="ball">⚽</span><span class="who">${atk?"Messi is shooting. Answer right to score!":"Inertia FC is shooting. Answer right so Dibu saves it!"}</span></div>
+    <div class="dots" aria-label="Shot history">${log.join("")}</div>
+    <p class="q">${q}</p><div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${ch[i]}</button>`).join("")}</div><div id="after"></div>`;
+  B.querySelectorAll(".choice").forEach(btn=>btn.onclick=()=>{
+    const ok=+btn.dataset.i===ans;
+    B.querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(+b.dataset.i===ans)b.classList.add("right")});
+    if(!ok)btn.classList.add("wrong");
+    const side=Math.random()<.5?-1:1,ball=$("#ball"),kp=$("#kp");
+    const scored=atk?ok:!ok;
+    ball.style.bottom="78px";ball.style.left=scored?`${50+side*22}%`:`${50+side*14}%`;ball.style.fontSize="22px";
+    kp.style.left=scored?`${50-side*20}%`:`${50+side*14}%`;kp.style.transform=`translateX(-50%) rotate(${scored?-side*70:side*20}deg)`;
+    if(atk&&ok){us++;addXP(10)} if(!atk&&ok){addXP(10)} if(!atk&&!ok)them++;
+    log.push(atk?(ok?"⚽":"❌"):(ok?"🧤":"😩"));
+    bi++;rd++;
+    const msg=atk?(ok?pick(GOAL):pick(MISS)):(ok?pick(SAVE):pick(CONCEDE));
+    const done=rd>=ROUNDS&&rd%2===0&&us!==them;
+    $("#after").innerHTML=`<div class="explain"><b>${msg}</b>${why}</div><div class="controls" style="margin-top:12px"><button class="btn sun" id="next">${done?"Final whistle!":rd%2===0?"Messi's turn":"Dibu's turn"}</button></div>`;
+    $("#next").focus();$("#next").onclick=bossTurn;
+  });
+}
+function bossEnd(){
+  const won=us>them;
+  $("#bossbody").innerHTML=`<div class="end"><span class="big">${won?"🏆":"🥔"}</span>
+    <h3 style="font-size:30px">${won?`Remi wins ${us}–${them}! Messi lifts the trophy, Dibu does the dance.`:`Inertia FC wins ${them}–${us}. The potatoes are insufferable.`}</h3>
+    <p style="margin:0;font-weight:700">${won?"+50 XP bonus. Champions of physics.":"Every miss showed you the why. Read those, then demand a rematch."}</p>
+    <div class="dots">${log.join("")}</div>
+    <button class="btn pink" id="rematch">Rematch</button></div>`;
+  if(won){addXP(50);confetti()}
+  $("#rematch").onclick=startBoss;
+}
+
+/* ---------- coaster ---------- */
+const G=9.8,H0=20;
+const hAt=t=>{ // track height in m for t in [0,1]; starts at the 20 m peak
+  return 2+18*(0.5+0.5*Math.cos(Math.PI*3*t))*(1-0.45*t)+ (t>0.66?0:0);
+};
+let pos=0,mass=200,playing=false,dir=1;
+const cv=$("#cv"),cx=cv.getContext("2d");
+function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function drawCoaster(){
+  const W=cv.width,Hh=cv.height,pad=30,t=pos/1000,h=hAt(t);
+  const X=t=>pad+t*(W-2*pad),Y=h=>Hh-pad-(h/H0)*(Hh-2*pad-30);
+  cx.clearRect(0,0,W,Hh);
+  // ground
+  cx.fillStyle=tok("--lime");cx.fillRect(0,Hh-pad+4,W,pad);
+  // supports
+  cx.strokeStyle=tok("--muted");cx.lineWidth=2;
+  for(let s=0;s<=1;s+=0.04){cx.beginPath();cx.moveTo(X(s),Y(hAt(s)));cx.lineTo(X(s),Hh-pad+4);cx.stroke()}
+  // track
+  cx.strokeStyle=tok("--ink");cx.lineWidth=7;cx.lineJoin="round";cx.beginPath();
+  for(let s=0;s<=1.0001;s+=0.005){const x=X(s),y=Y(hAt(s));s?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke();
+  // cart
+  const x=X(t),y=Y(h),r=10+mass/40;
+  cx.fillStyle=tok("--pop");cx.strokeStyle=tok("--ink");cx.lineWidth=3;
+  cx.beginPath();cx.arc(x,y-r,r,0,Math.PI*2);cx.fill();cx.stroke();
+  cx.fillStyle=tok("--ink");cx.beginPath();cx.arc(x-r/3,y-r-2,2.5,0,7);cx.arc(x+r/3,y-r-2,2.5,0,7);cx.fill();
+  cx.beginPath();cx.lineWidth=2;cx.arc(x,y-r+2,r/3,0.1*Math.PI,0.9*Math.PI);cx.stroke();
+  // numbers
+  const PE=mass*G*h,TOT=mass*G*H0,KE=TOT-PE,v=Math.sqrt(2*G*(H0-h));
+  $("#hv").textContent=h.toFixed(1)+" m";$("#vv").textContent=v.toFixed(1)+" m/s";
+  $("#pev").textContent=Math.round(PE).toLocaleString()+" J";$("#kev").textContent=Math.round(KE).toLocaleString()+" J";
+  $("#peb").style.width=PE/TOT*100+"%";$("#keb").style.width=KE/TOT*100+"%";
+  $("#callout").textContent=h>H0-0.3?"Top of the tallest hill: MAX potential, almost zero kinetic.":h<3?"Bottom of a drop: MAX kinetic, fastest point. WHEEEE.":PE>KE?"Climbing: more stored energy than motion energy.":"Diving: kinetic energy is winning.";
+}
+$("#pos").oninput=e=>{pos=+e.target.value;drawCoaster()};
+$("#mass").oninput=e=>{mass=+e.target.value;$("#massv").textContent=mass;drawCoaster()};
+$("#play").onclick=()=>{playing=!playing;$("#play").textContent=playing?"Pause":"Let it rip!";if(playing)requestAnimationFrame(step)};
+function step(){
+  if(!playing||$("#coaster").hidden){playing=false;$("#play").textContent="Let it rip!";return}
+  const v=Math.sqrt(2*G*(H0-hAt(pos/1000)))+0.6; // tiny nudge so it leaves the peak
+  pos+=dir*v*0.35;if(pos>=1000){pos=1000;dir=-1}if(pos<=0){pos=0;dir=1}
+  $("#pos").value=pos;drawCoaster();requestAnimationFrame(step);
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>!$("#coaster").hidden&&drawCoaster());
+
+/* ---------- confetti ---------- */
+function confetti(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const c=$("#conf"),x=c.getContext("2d");c.hidden=false;c.width=innerWidth;c.height=innerHeight;
+  const cols=["--pop","--sky","--lime","--sun","--grape"].map(tok);
+  const P=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,vx:(Math.random()-.5)*3,vy:2+Math.random()*3,r:Math.random()*6,c:pick(cols),a:Math.random()*6}));
+  let f=0;(function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.a+=.1;x.fillStyle=p.c;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillRect(-4,-2,8+p.r,5);x.restore()});
+    if(++f<180)requestAnimationFrame(d);else c.hidden=true})();
+}
+</script>
+</body>
+</html>
