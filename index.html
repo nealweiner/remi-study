@@ -135,7 +135,7 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
 .end .big{font-size:80px}
 
 /* coaster */
-.coaster canvas{width:100%;height:auto;aspect-ratio:2/1;max-width:100%;border:3px solid var(--ink);border-radius:14px;background:var(--bg)}
+.coaster canvas{touch-action:pan-y;width:100%;height:auto;aspect-ratio:2/1;max-width:100%;border:3px solid var(--ink);border-radius:14px;background:var(--bg)}
 .meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
 .meter{padding:12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);display:grid;gap:6px}
 .meter b{font-family:var(--display);font-weight:400;font-size:18px}
@@ -144,6 +144,13 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
 .sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;font-weight:800}
 .sliders label{display:grid;gap:4px}
 input[type=range]{width:100%;accent-color:var(--pop)}
+.coaster canvas.building{touch-action:none;cursor:ns-resize;outline:3px dashed var(--grape);outline-offset:3px}
+.cars{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+.cars button{font-size:26px;line-height:1;width:52px;height:52px;border:3px solid var(--ink);border-radius:12px;background:var(--paper);box-shadow:3px 3px 0 var(--shadow)}
+.cars button[aria-pressed="true"]{background:var(--sun);transform:translateY(-3px) rotate(-4deg)}
+.cars span{font-weight:800;margin-right:4px}
+.build-tip{margin:0;font-weight:800;color:var(--grape);text-align:center}
+.btn.on{background:var(--grape);color:#fff}
 .callout{font-weight:800;text-align:center;font-size:18px;min-height:1.5em}
 
 /* power-ups */
@@ -186,7 +193,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <div class="tiles">
       <button class="tile sticker" data-go="flash"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Think of the answer FIRST, then flip. No peeking, no cheating, no llamas.</p></button>
       <button class="tile sticker" data-go="boss"><span class="duo" id="tileduo"></span><h3>Penalty Shootout</h3><p>Messi shoots, Dibu saves. Answer right to score (and to stop Inertia FC from scoring).</p></button>
-      <button class="tile sticker" data-go="coaster"><span class="big">🎢</span><h3>Roller Coaster Lab</h3><p>Drag the cart around and watch potential energy turn into kinetic energy.</p></button>
+      <button class="tile sticker" data-go="coaster"><span class="big">🎢</span><h3>Roller Coaster Lab</h3><p>Build your own coaster, pick a car, and launch it over the crocodile gap. Too slow and you crash!</p></button>
       <button class="tile sticker" data-go="power"><span class="big">⚡</span><h3>Power-Ups</h3><p>Every formula and unit on one cheat sheet. Look, then go test yourself.</p></button>
     </div>
   </section>
@@ -212,8 +219,17 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <div class="sliders">
       <label for="pos">Cart position<input id="pos" type="range" min="0" max="1000" value="0"></label>
       <label for="mass">Cart mass: <span id="massv">200</span> kg<input id="mass" type="range" min="50" max="500" step="50" value="200"></label>
+      <label for="land">Landing track height: <span id="landv">5</span> m<input id="land" type="range" min="0" max="20" step="1" value="5"></label>
     </div>
-    <div class="controls"><button class="btn lime" id="play">Let it rip!</button></div>
+    <div class="cars" id="cars" role="group" aria-label="Choose your car"></div>
+    <div class="controls"><button class="btn lime" id="play">Let it rip!</button><button class="btn alt" id="build" aria-pressed="false">Build my own coaster</button></div>
+    <div id="buildbar" class="controls" hidden>
+      <span style="font-weight:800;align-self:center">Start from:</span>
+      <button class="btn alt" data-preset="classic">Classic</button><button class="btn alt" data-preset="mega">Mega drop</button>
+      <button class="btn alt" data-preset="bunny">Bunny hops</button><button class="btn alt" data-preset="tall">Too-tall hill</button>
+      <button class="btn alt" data-preset="flat">Flat (boring)</button>
+    </div>
+    <p class="build-tip" id="buildtip" hidden>Drag the purple dots up and down to shape your track. The first dot is where the cart starts.</p>
     <div class="meters">
       <div class="meter"><b>Height</b><span class="num" id="hv">20.0 m</span></div>
       <div class="meter"><b>Speed</b><span class="num" id="vv">0.0 m/s</span></div>
@@ -221,7 +237,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
       <div class="meter ke"><b>Kinetic energy (motion)</b><span class="num" id="kev">0 J</span><div class="bar"><i id="keb"></i></div></div>
     </div>
     <div class="callout" id="callout"></div>
-    <p style="margin:0;color:var(--muted);font-weight:700">No friction here, so the total never changes: whatever PE loses, KE gains. Try a bigger mass: both bars hold more joules, because mass is in both formulas.</p>
+    <p style="margin:0;color:var(--muted);font-weight:700">At the end of the track the cart launches over the gap. Make the last dot a ramp pointing up, and start high enough to have the speed to make it. No friction here, so the total energy never changes: whatever PE loses, KE gains. The dashed line is the starting height. The cart can never go above it, because it would need more PE than it started with. Try a bigger mass: both bars hold more joules, because mass is in both formulas.</p>
   </section>
 
   <!-- POWER-UPS -->
@@ -448,47 +464,137 @@ function bossEnd(){
 }
 
 /* ---------- coaster ---------- */
-const G=9.8,H0=20;
-const hAt=t=>{ // track height in m for t in [0,1]; starts at the 20 m peak
-  return 2+18*(0.5+0.5*Math.cos(Math.PI*3*t))*(1-0.45*t)+ (t>0.66?0:0);
-};
-let pos=0,mass=200,playing=false,dir=1;
-const cv=$("#cv"),cx=cv.getContext("2d");
+// World in meters: track 1 spans x 0..L1, then a gap, then the landing track at height LAND.
+const G=9.8,HMAX=30,L1=44,GAP_END=56,PLAT_END=71;
+const PRESETS={classic:[20,4,14,3,10,2,4,9],mega:[29,1,6,18,2,12,3,10],bunny:[18,6,12,5,11,4,6,10],tall:[16,3,24,4,10,2,4,8],flat:[10,10,10,10,10,10,10,10]};
+const CARS=[["blob","Smiley blob"],["🏎️","Race car"],["🚀","Rocket"],["🥔","Potato"],["⚽","Soccer ball"],["🦄","Unicorn"],["🐢","Turtle"]];
+let PTS=PRESETS.classic.slice(),car="blob",LAND=5;
+const clampH=h=>Math.max(0.5,Math.min(HMAX,h));
+function hAt(t){ // Catmull-Rom through the control points, t in [0,1]
+  const n=PTS.length-1,f=Math.min(Math.max(t,0)*n,n-1e-9),i=Math.floor(f),u=f-i;
+  const p0=PTS[Math.max(0,i-1)],p1=PTS[i],p2=PTS[i+1],p3=PTS[Math.min(n,i+2)];
+  return clampH(0.5*((2*p1)+(-p0+p2)*u+(2*p0-5*p1+4*p2-p3)*u*u+(-p0+3*p1-3*p2+p3)*u*u*u));
+}
+const Hs=()=>hAt(0);
+let pos=0,mass=200,playing=false,dir=1,building=false,blockedAt=0,dragI=-1;
+let phase="track",air=null,lastTs=0; // phase: track | air | landed | crashed
+const cv=$("#cv"),cx=cv.getContext("2d"),PAD=30,S=(400-2*PAD-30)/HMAX;
+const XM=m=>PAD+m*S,Y=h=>cv.height-PAD-h*S,X=t=>XM(t*L1);
 function tok(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function drawCar(x,y,ang,r){
+  cx.save();cx.translate(x,y);cx.rotate(-ang);
+  if(car==="blob"){cx.fillStyle=tok("--pop");cx.strokeStyle=tok("--ink");cx.lineWidth=3;
+    cx.beginPath();cx.arc(0,-r,r,0,Math.PI*2);cx.fill();cx.stroke();
+    cx.fillStyle=tok("--ink");cx.beginPath();cx.arc(-r/3,-r-2,2.5,0,7);cx.arc(r/3,-r-2,2.5,0,7);cx.fill();
+    cx.beginPath();cx.lineWidth=2;cx.arc(0,-r+2,r/3,0.1*Math.PI,0.9*Math.PI);cx.stroke();}
+  else{cx.font=`${r*2.3}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;cx.textAlign="center";cx.textBaseline="bottom";cx.fillText(car,0,4)}
+  cx.restore();
+}
+function cartState(){ // {x m, h m, v m/s, ang rad}
+  if(phase==="track"){const t=pos/1000,h=hAt(t),d=(hAt(Math.min(1,t+0.005))-hAt(Math.max(0,t-0.005)))/(0.01*L1);
+    const hs=Hs();return{x:t*L1,h,v:h>hs+0.05?0:Math.sqrt(Math.max(0,2*G*(hs-h))),ang:Math.atan(d)}}
+  return{x:air.x,h:air.y,v:Math.hypot(air.vx,air.vy),ang:phase==="landed"?0:Math.atan2(air.vy,air.vx)};
+}
 function drawCoaster(){
-  const W=cv.width,Hh=cv.height,pad=30,t=pos/1000,h=hAt(t);
-  const X=t=>pad+t*(W-2*pad),Y=h=>Hh-pad-(h/H0)*(Hh-2*pad-30);
+  const W=cv.width,Hh=cv.height,hs=Hs(),st=cartState();
   cx.clearRect(0,0,W,Hh);
-  // ground
-  cx.fillStyle=tok("--lime");cx.fillRect(0,Hh-pad+4,W,pad);
+  // ground + crocodile pit in the gap
+  cx.fillStyle=tok("--lime");cx.fillRect(0,Hh-PAD+4,XM(L1)+4,PAD);cx.fillRect(XM(GAP_END)-4,Hh-PAD+4,W,PAD);
+  cx.fillStyle=tok("--sky");cx.fillRect(XM(L1)+4,Hh-PAD-6,XM(GAP_END)-XM(L1)-8,PAD+10);
+  cx.font='28px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';cx.textAlign="center";cx.textBaseline="alphabetic";cx.fillText("🐊",(XM(L1)+XM(GAP_END))/2,Hh-PAD+8);
+  // energy line
+  cx.setLineDash([10,8]);cx.strokeStyle=tok("--grape");cx.lineWidth=2;cx.beginPath();cx.moveTo(0,Y(hs));cx.lineTo(W,Y(hs));cx.stroke();cx.setLineDash([]);
+  cx.fillStyle=tok("--grape");cx.font="bold 15px Nunito, sans-serif";cx.textAlign="right";cx.fillText(`start height ${hs.toFixed(1)} m: the cart can't go above this`,W-10,Y(hs)-8);
   // supports
   cx.strokeStyle=tok("--muted");cx.lineWidth=2;
-  for(let s=0;s<=1;s+=0.04){cx.beginPath();cx.moveTo(X(s),Y(hAt(s)));cx.lineTo(X(s),Hh-pad+4);cx.stroke()}
-  // track
-  cx.strokeStyle=tok("--ink");cx.lineWidth=7;cx.lineJoin="round";cx.beginPath();
-  for(let s=0;s<=1.0001;s+=0.005){const x=X(s),y=Y(hAt(s));s?cx.lineTo(x,y):cx.moveTo(x,y)}cx.stroke();
+  for(let s=0;s<=1;s+=0.04){cx.beginPath();cx.moveTo(X(s),Y(hAt(s)));cx.lineTo(X(s),Hh-PAD+4);cx.stroke()}
+  for(let m=GAP_END;m<=PLAT_END;m+=3){cx.beginPath();cx.moveTo(XM(m),Y(LAND));cx.lineTo(XM(m),Hh-PAD+4);cx.stroke()}
+  // track 1 (red where it's above the start height: unreachable)
+  cx.lineWidth=7;cx.lineJoin=cx.lineCap="round";
+  for(let s=0;s<1;s+=0.005){const h1=hAt(s),h2=hAt(s+0.005);cx.strokeStyle=(h1>hs+0.05||h2>hs+0.05)?tok("--bad"):tok("--ink");
+    cx.beginPath();cx.moveTo(X(s),Y(h1));cx.lineTo(X(s+0.005),Y(h2));cx.stroke()}
+  // landing track + finish flag
+  cx.strokeStyle=tok("--ink");cx.beginPath();cx.moveTo(XM(GAP_END),Y(LAND));cx.lineTo(XM(PLAT_END),Y(LAND));cx.stroke();
+  cx.font='26px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';cx.textAlign="center";cx.fillText("🏁",XM(PLAT_END)-6,Y(LAND)-6);
+  // predicted flight path while building (dotted)
+  if(building){const L=launch();if(L){cx.setLineDash([3,6]);cx.strokeStyle=tok("--pop");cx.lineWidth=3;cx.beginPath();
+    for(let t=0;t<4;t+=0.05){const x=L.x+L.vx*t,y=L.y+L.vy*t-G*t*t/2;if(y<0||x>PLAT_END+15||(x>=GAP_END&&x<=PLAT_END&&y<=LAND))break;t?cx.lineTo(XM(x),Y(y)):cx.moveTo(XM(x),Y(y))}cx.stroke();cx.setLineDash([])}}
+  // build handles
+  if(building)PTS.forEach((p,i)=>{const x=X(i/(PTS.length-1)),y=Y(p);cx.fillStyle=tok("--grape");cx.strokeStyle=tok("--ink");cx.lineWidth=3;
+    cx.beginPath();cx.arc(x,y,i===dragI?16:13,0,7);cx.fill();cx.stroke();cx.fillStyle="#fff";cx.textAlign="center";cx.font="bold 12px Nunito, sans-serif";cx.fillText(i===0?"GO":Math.round(p),x,y+4)});
   // cart
-  const x=X(t),y=Y(h),r=10+mass/40;
-  cx.fillStyle=tok("--pop");cx.strokeStyle=tok("--ink");cx.lineWidth=3;
-  cx.beginPath();cx.arc(x,y-r,r,0,Math.PI*2);cx.fill();cx.stroke();
-  cx.fillStyle=tok("--ink");cx.beginPath();cx.arc(x-r/3,y-r-2,2.5,0,7);cx.arc(x+r/3,y-r-2,2.5,0,7);cx.fill();
-  cx.beginPath();cx.lineWidth=2;cx.arc(x,y-r+2,r/3,0.1*Math.PI,0.9*Math.PI);cx.stroke();
+  const r=10+mass/40;
+  if(phase==="crashed"){cx.font=`${r*3}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;cx.textAlign="center";cx.fillText("💥",XM(st.x),Y(st.h)+r)}
+  else drawCar(XM(st.x),Y(st.h),st.ang,r);
   // numbers
-  const PE=mass*G*h,TOT=mass*G*H0,KE=TOT-PE,v=Math.sqrt(2*G*(H0-h));
-  $("#hv").textContent=h.toFixed(1)+" m";$("#vv").textContent=v.toFixed(1)+" m/s";
+  const TOT=mass*G*hs,PE=mass*G*st.h,KE=0.5*mass*st.v*st.v;
+  $("#hv").textContent=st.h.toFixed(1)+" m";$("#vv").textContent=st.v.toFixed(1)+" m/s";
   $("#pev").textContent=Math.round(PE).toLocaleString()+" J";$("#kev").textContent=Math.round(KE).toLocaleString()+" J";
-  $("#peb").style.width=PE/TOT*100+"%";$("#keb").style.width=KE/TOT*100+"%";
-  $("#callout").textContent=h>H0-0.3?"Top of the tallest hill: MAX potential, almost zero kinetic.":h<3?"Bottom of a drop: MAX kinetic, fastest point. WHEEEE.":PE>KE?"Climbing: more stored energy than motion energy.":"Diving: kinetic energy is winning.";
+  $("#peb").style.width=Math.min(100,PE/TOT*100)+"%";$("#keb").style.width=Math.min(100,KE/TOT*100)+"%";
+  let minH=HMAX;for(let s=0;s<=1;s+=0.01)minH=Math.min(minH,hAt(s));
+  $("#callout").textContent=
+    phase==="air"?"AIRBORNE! It keeps moving forward (inertia!) while gravity pulls it down.":
+    phase==="landed"?(air.vx>0.1?"Touchdown! The brakes turn its kinetic energy into heat.":"STUCK THE LANDING! +15 XP"):
+    phase==="crashed"?(air.why==="over"?"Flew right over the landing track! Too much speed. Start lower or raise the landing.":"CRASH! Not fast enough to clear the gap. Start higher, or lower the landing track."):
+    st.h>hs+0.05?"The cart can't get here! This spot is higher than the start, so it would need more energy than it has.":
+    performance.now()-blockedAt<1500?"Not enough energy to climb that hill! It's taller than the start, so the cart rolls back.":
+    hAt(0.001)>hs+0.01&&pos<5?"Uh oh: the track goes UP from the start, so the cart can't even get going. Make the first dot the highest.":
+    hs-st.h<0.3?"At the starting height: MAX potential, zero kinetic.":
+    st.h-minH<0.5?"Lowest point of the track: MAX kinetic, fastest spot. WHEEEE.":
+    PE>KE?"Up high: more stored energy than motion energy.":"Down low: kinetic energy is winning.";
 }
-$("#pos").oninput=e=>{pos=+e.target.value;drawCoaster()};
+function launch(){ // launch velocity at the end of track 1, or null if the cart can't get there
+  const hs=Hs(),he=hAt(1);for(let s=0;s<=1;s+=0.005)if(hAt(s)>hs+0.02)return null;
+  const v=Math.sqrt(Math.max(0,2*G*(hs-he)))+0.3,a=Math.atan((he-hAt(0.99))/(0.01*L1));
+  return{x:L1,y:he,vx:v*Math.cos(a),vy:v*Math.sin(a)};
+}
+function resetRun(){phase="track";air=null;pos=0;dir=1;$("#pos").value=0}
+$("#pos").oninput=e=>{if(phase!=="track")phase="track";pos=+e.target.value;drawCoaster()};
 $("#mass").oninput=e=>{mass=+e.target.value;$("#massv").textContent=mass;drawCoaster()};
-$("#play").onclick=()=>{playing=!playing;$("#play").textContent=playing?"Pause":"Let it rip!";if(playing)requestAnimationFrame(step)};
-function step(){
-  if(!playing||$("#coaster").hidden){playing=false;$("#play").textContent="Let it rip!";return}
-  const v=Math.sqrt(2*G*(H0-hAt(pos/1000)))+0.6; // tiny nudge so it leaves the peak
-  pos+=dir*v*0.35;if(pos>=1000){pos=1000;dir=-1}if(pos<=0){pos=0;dir=1}
-  $("#pos").value=pos;drawCoaster();requestAnimationFrame(step);
+$("#land").oninput=e=>{LAND=+e.target.value;$("#landv").textContent=LAND;if(phase!=="track")resetRun();drawCoaster()};
+$("#cars").innerHTML="<span>Your car:</span>"+CARS.map(([c,n])=>`<button aria-label="${n}" title="${n}" aria-pressed="${c===car}" data-car="${c}">${c==="blob"?"🙂":c}</button>`).join("");
+$("#cars").onclick=e=>{const b=e.target.closest("[data-car]");if(!b)return;car=b.dataset.car;$("#cars").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));drawCoaster()};
+function stopPlay(){playing=false;$("#play").textContent=phase==="track"?"Let it rip!":"Go again!"}
+$("#play").onclick=()=>{if(playing)return stopPlay();if(building)setBuild(false);if(phase!=="track")resetRun();playing=true;lastTs=0;$("#play").textContent="Pause";requestAnimationFrame(step)};
+function step(ts){
+  if(!playing||$("#coaster").hidden)return stopPlay();
+  const dt=lastTs?Math.min(0.05,(ts-lastTs)/1000):0.016;lastTs=ts;
+  if(phase==="track"){
+    const hs=Hs(),h=hAt(pos/1000),v=Math.sqrt(Math.max(0,2*G*(hs-h)))+0.6; // tiny nudge so it leaves the start
+    const next=Math.max(0,Math.min(1000,pos+dir*v*0.35));
+    if(hAt(next/1000)>hs+0.02){dir=-dir;blockedAt=performance.now();if(pos<1){drawCoaster();return stopPlay()}} // can't climb: roll back
+    else pos=next;
+    if(pos<=0)dir=1;
+    if(pos>=1000){air=launch();phase="air"}
+    $("#pos").value=pos;
+  }else if(phase==="air"){
+    const px=air.x,py=air.y;air.x+=air.vx*dt;air.vy-=G*dt;air.y+=air.vy*dt;
+    if(px<GAP_END&&air.x>=GAP_END&&air.y<LAND){air.x=GAP_END;phase="crashed";air.why="short"}
+    else if(air.x>=GAP_END&&air.x<=PLAT_END&&air.y<=LAND&&air.vy<0){air.y=LAND;air.vy=0;phase="landed"}
+    else if(air.y<=0){air.y=0;phase="crashed";air.why=air.x>PLAT_END?"over":"short"}
+    else if(air.x>PLAT_END+12){phase="crashed";air.why="over"}
+  }else if(phase==="landed"){
+    const brake=Math.max(air.vx*air.vx/(2*Math.max(0.5,PLAT_END-1.5-air.x)),3); // stop before the flag
+    air.vx=Math.max(0,air.vx-brake*dt);air.x=Math.min(PLAT_END-1.5,air.x+air.vx*dt);
+    if(air.vx<=0.05){air.vx=0;drawCoaster();addXP(15);confetti();return stopPlay()}
+  }
+  drawCoaster();
+  if(phase==="crashed")return stopPlay();
+  requestAnimationFrame(step);
 }
+function setBuild(on){building=on;stopPlay();resetRun();
+  $("#build").textContent=on?"Done building":"Build my own coaster";$("#build").setAttribute("aria-pressed",on);$("#build").classList.toggle("on",on);
+  $("#buildbar").hidden=$("#buildtip").hidden=!on;cv.classList.toggle("building",on);stopPlay();drawCoaster()}
+$("#build").onclick=()=>setBuild(!building);
+document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{PTS=PRESETS[b.dataset.preset].slice();resetRun();drawCoaster()});
+function canvasPt(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]}
+cv.addEventListener("pointerdown",e=>{if(!building)return;const[x,y]=canvasPt(e);let best=-1,bd=60;
+  PTS.forEach((p,i)=>{const d=Math.hypot(X(i/(PTS.length-1))-x,Y(p)-y);if(d<bd){bd=d;best=i}});
+  if(best<0)PTS.forEach((p,i)=>{if(Math.abs(X(i/(PTS.length-1))-x)<30)best=i}); // tap anywhere in a dot's column
+  if(best>=0){dragI=best;cv.setPointerCapture(e.pointerId);move(e)}});
+function move(e){if(dragI<0)return;const[,y]=canvasPt(e);PTS[dragI]=Math.round(clampH((cv.height-PAD-y)/S)*2)/2;drawCoaster()}
+cv.addEventListener("pointermove",move);
+cv.addEventListener("pointerup",()=>{dragI=-1;drawCoaster()});cv.addEventListener("pointercancel",()=>{dragI=-1});
 matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>!$("#coaster").hidden&&drawCoaster());
 
 /* ---------- confetti ---------- */
