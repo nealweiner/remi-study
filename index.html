@@ -247,7 +247,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <h2 style="font-size:30px">Land Between the Rivers</h2>
     <p>Mesopotamia test on Monday, Nov 16. Climb the candy ladder to win the Lollipop Trophy.</p>
     <div class="tiles">
-      <button class="tile sticker" data-go="lolly" data-quest="ss"><span class="big">🍭</span><h3>Lollipop Quest</h3><p>Questions get harder as you go. Every 50 points is a checkpoint you can never fall below. Reach 300 for the trophy!</p></button>
+      <button class="tile sticker" data-go="lolly" data-quest="ss"><span class="big">🍭</span><h3>Lollipop Quest</h3><p>Harder questions are worth more. Every 50 points is a checkpoint you can never fall below. At 300, beat the Trophy Gate to win!</p></button>
       <button class="tile sticker" data-go="flash" data-deck="ss"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Every Mesopotamia word and person. Say it before you flip!</p></button>
       <button class="tile sticker" data-go="sspower"><span class="big">📜</span><h3>Cheat Sheet</h3><p>The whole unit on one page: rivers, Sumer, kings and empires.</p></button>
     </div>
@@ -793,8 +793,11 @@ $("#elacheat").innerHTML=ELA_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p
 $("#sscheat").innerHTML=SS_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
 
 /* ---------- lollipop quest ---------- */
-// Points: right = +10 × level, wrong costs LOSS[level] (always less than a right answer earns), never below the last 50-point checkpoint.
-const LOSS=[0,2,10,15,20];
+// Points: right = GAIN[level] (only +1 for a question already answered right), a miss costs LOSS[level]
+// (always less than a right answer earns), never below the last 50-point checkpoint.
+// The whole bank answered right once is worth ~280, so a trophy means learning every question.
+// At 300 the trophy gate needs 5 hardest questions right in a row (a miss just restarts the gate count).
+const GAIN=[0,2,3,5,8],LOSS=[0,0,1,2,3],GATE=5;
 // Two right in a row → harder level; a miss → easier level. So progress only goes forward on net.
 const LADDER=[[50,"🐻","Gummy bear"],[100,"🪱","Sour worm"],[150,"🍫","Chocolate"],[200,"🧁","Cupcake"],[250,"🍩","Donut"],[300,"🍭","LOLLIPOP TROPHY"]];
 const LEVELS=["","Sprinkle (easy)","Gumdrop","Jawbreaker","Mega Jawbreaker (hard)"];
@@ -806,7 +809,7 @@ const LQ_RIGHT=["Messi: GOOOOL! What a golazo of an answer!","Messi: That's a Wo
 const LQ_WRONG=["Dibu dives and saves most of your points! Here's the answer:","Dibu: No pasa nada! Here's how it works:","Dibu: I've got your back. Lock this one in:"];
 const lqDuo=(m="idle",d="idle")=>{$("#lqduo").innerHTML=messi(m)+dibu(d)};
 let L;
-function lqLoad(){L=null;try{L=JSON.parse(localStorage.getItem(Q.key))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.recent=[];L.redo=[];L.since=0}
+function lqLoad(){L=null;try{L=JSON.parse(localStorage.getItem(Q.key))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.mastered=L.mastered||[];L.gate=L.gate||0;L.recent=[];L.redo=[];L.since=0}
 function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem(Q.key,JSON.stringify(k))}catch(e){}}
 function lqGoal(){return 300*(L.trophies+1)}
 function drawLq(){
@@ -817,43 +820,57 @@ function drawLq(){
     return `<li class="${got?"got":nxt?"next":""}">${e} ${v}${n===300?" "+name:""}</li>`}).join("");
   $("#lqcoupons").innerHTML=Array.from({length:L.trophies},(_,i)=>i+1).map(n=>`<button class="btn ${L.cashed?.[n]?"alt":"lime"}" data-coupon="${n}">🍭 Trophy #${n}: ${L.cashed?.[n]?"view coupon":"cash in!"}</button>`).join("");
   $("#lqcoupons").querySelectorAll("[data-coupon]").forEach(b=>b.onclick=()=>lqCoupon(+b.dataset.coupon));
-  $("#lqsafe").textContent=L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn.";
+  $("#lqsafe").textContent=L.gating?`TROPHY GATE: ${L.gate} of ${GATE} hardest questions right in a row. A miss just restarts the count.`:L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn.";
 }
 function startLolly(id){const nq=QUESTS[id]||Q;if(nq!==Q||!L){Q=nq;lqLoad()}drawLq();lqAsk()}
 function lqPick(){
-  if(L.redo.length&&L.since>=3){L.since=0;return L.redo.shift()} // missed questions come back later
   const B=Q.bank();
-  for(const d of [0,-1,1,-2,2]){const pool=B.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q));if(pool.length)return pick(pool)}
+  if(L.gating){const pool=B.filter(q=>q.lv===4&&!L.recent.includes(q));return pick(pool.length?pool:B.filter(q=>q.lv===4))}
+  if(L.redo.length&&L.since>=3){L.since=0;return L.redo.shift()} // missed questions come back later
+  for(const fresh of [true,false]) // unmastered questions first
+    for(const d of [0,-1,1,-2,2]){const pool=B.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q)&&(!fresh||!L.mastered.includes(q.q)));if(pool.length)return pick(pool)}
   L.recent=[];return pick(B);
 }
+const lqWorth=q=>L.mastered.includes(q.q)?1:GAIN[L.lv];
 function lqAsk(){
   lqDuo();const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,Q.bank().length-4))L.recent.shift();
-  const order=shuffle(q.ch.map((c,i)=>i)),gain=10*L.lv;
-  $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">+${gain}</span>${q.q}</p>
+  const order=shuffle(q.ch.map((c,i)=>i)),gain=L.gating?"GATE":"+"+lqWorth(q);
+  $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">${gain}</span>${q.q}</p>
     <div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${q.ch[i]}</button>`).join("")}</div><div id="lqafter"></div>`;
   $("#lqbody").querySelectorAll(".choice").forEach(b=>b.onclick=()=>lqAnswer(q,+b.dataset.i===q.a,b));
 }
 function lqAnswer(q,ok,btn){
   $("#lqbody").querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(+b.dataset.i===q.a)b.classList.add("right")});
-  const lv=L.lv,before=L.pts;let msg,note="";L.since++;
-  if(ok){L.pts+=10*lv;L.streak++;msg=pick(LQ_RIGHT);addXP(5);
+  if(L.gating)return lqGateAnswer(q,ok,btn);
+  const lv=L.lv,before=L.pts,worth=lqWorth(q);let msg,note="";L.since++;
+  if(ok){L.pts+=worth;L.streak++;msg=pick(LQ_RIGHT);addXP(2);if(!L.mastered.includes(q.q))L.mastered.push(q.q);
     if(L.streak>=2&&L.lv<4){L.lv++;L.streak=0;note=`Level up! Next questions are ${LEVELS[L.lv]}.`}}
   else{btn.classList.add("wrong");L.pts=Math.max(L.ckpt,L.pts-LOSS[lv]);L.streak=0;msg=pick(LQ_WRONG);if(!L.redo.includes(q))L.redo.push(q);
     if(L.lv>1)L.lv--;}
   const newCk=Math.floor(L.pts/50)*50;let ckMsg="";
   if(newCk>L.ckpt){L.ckpt=newCk;const c=LADDER.find(([n])=>n===newCk-300*L.trophies);if(c&&c[0]<300)ckMsg=`Checkpoint! You earned a ${c[2]} ${c[1]}. Points can't drop below ${newCk} now.`}
-  const won=L.pts>=lqGoal();lqSave();
+  const won=L.pts>=lqGoal();if(won){L.gating=true;L.gate=0}lqSave();
   lqDuo(ok?"celebrate":"idle",ok?"idle":"dance");
   if(!ok&&L.pts===before)msg="DIBU SAVES IT! Your checkpoint kept every point. Here's the answer:";
   const d=L.pts-before;
   $("#pop").classList.remove("bump");void $("#pop").offsetWidth;if(ok)$("#pop").classList.add("bump");
   drawLq();
   $("#lqafter").innerHTML=`<div class="explain"><b>${msg} <span class="delta ${d>=0?"up":"down"}">${d>0?"+"+d:d<0?d:"±0"}</span></b>${q.why}${note?`<br><i>${note}</i>`:""}${ckMsg?`<br><b style="font-size:17px">${ckMsg}</b>`:""}</div>
-    <div class="controls" style="margin-top:12px"><button class="btn sun" id="lqnext">${won?"Claim your trophy!":"Next question"}</button></div>`;
-  $("#lqnext").focus();$("#lqnext").onclick=won?lqTrophy:lqAsk;
+    <div class="controls" style="margin-top:12px"><button class="btn sun" id="lqnext">${won?"Enter the Trophy Gate!":"Next question"}</button></div>`;
+  $("#lqnext").focus();$("#lqnext").onclick=lqAsk;
+}
+function lqGateAnswer(q,ok,btn){
+  $("#lqbody").querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(+b.dataset.i===q.a)b.classList.add("right")});
+  if(ok)L.gate++;else{btn.classList.add("wrong");L.gate=0}
+  const done=L.gate>=GATE;lqSave();
+  lqDuo(ok?"celebrate":"idle",ok?"idle":"dance");drawLq();
+  const msg=ok?(done?"Messi: THE GATE IS OPEN!":`Messi: ${L.gate} down, ${GATE-L.gate} to go!`):"Dibu: The gate count restarts, but your points are safe. Here's the answer:";
+  $("#lqafter").innerHTML=`<div class="explain"><b>${msg}</b>${q.why}</div>
+    <div class="controls" style="margin-top:12px"><button class="btn sun" id="lqnext">${done?"Claim your trophy!":"Next gate question"}</button></div>`;
+  $("#lqnext").focus();$("#lqnext").onclick=done?lqTrophy:lqAsk;
 }
 function lqTrophy(){
-  L.trophies++;lqSave();addXP(50);confetti();
+  L.trophies++;L.gating=false;L.gate=0;L.mastered=[];L.pts=Math.max(L.pts,300*L.trophies);L.ckpt=Math.max(L.ckpt,300*L.trophies);lqSave();addXP(50);confetti();
   $("#lqbody").innerHTML=`<div class="end"><div class="duo" aria-hidden="true">${messi("celebrate")}<div class="trophy"><div class="pop-head"></div><div class="cup">REMI</div><div class="base"></div></div>${dibu("dance")}</div>
     <h3 style="font-size:30px">You won the Lollipop Trophy${L.trophies>1?" #"+L.trophies:""}!</h3>
     <p style="margin:0;font-weight:700">${L.pts} points. Messi and Dibu are lifting you up! ${Q.win} Keep going for trophy #${L.trophies+1}!</p>
