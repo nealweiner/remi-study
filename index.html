@@ -135,7 +135,8 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
 .end .big{font-size:80px}
 
 /* lollipop quest */
-.lq-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.lq-duo{display:flex;align-items:flex-end;gap:2px}.lq-duo .guy{width:58px}
+.lq-top{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:center}
 .pop{display:grid;justify-items:center}
 .pop-head{position:relative;width:120px;height:120px;border-radius:50%;border:4px solid var(--ink);display:grid;place-items:center;overflow:hidden;
   background:repeating-conic-gradient(var(--pop) 0 22deg,#fff 22deg 44deg,var(--sky) 44deg 66deg,#fff 66deg 88deg)}
@@ -167,6 +168,15 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
 .trophy .cup{width:150px;height:90px;background:linear-gradient(90deg,#e8a900,#ffd84d,#e8a900);border:4px solid var(--ink);border-radius:0 0 70px 70px;margin-top:-6px;display:grid;place-items:center;font-family:var(--display);color:#1d1a2e;font-size:18px}
 .trophy .base{width:90px;height:22px;background:#e8a900;border:4px solid var(--ink);border-top:none}
 @media (max-width:520px){.lq-top{grid-template-columns:1fr;justify-items:center}.pop-head{width:100px;height:100px}}
+
+/* number crunch */
+.cc-form{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.cc-form input{font:inherit;font-size:22px;font-weight:800;width:9em;max-width:100%;padding:8px 12px;border:3px solid var(--ink);border-radius:12px;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+.cc-unit{font-weight:800;font-size:20px}
+.cc-given{display:flex;flex-wrap:wrap;gap:8px}
+.cc-given span{border:2px solid var(--ink);border-radius:10px;padding:2px 10px;font-weight:800;background:color-mix(in srgb,var(--sky) 30%,var(--paper))}
+.steps{margin:6px 0 0;padding-left:22px;font-weight:700}
+.steps li{margin:2px 0}
 
 /* coaster */
 .coaster canvas{touch-action:pan-y;width:100%;height:auto;aspect-ratio:2/1;max-width:100%;border:3px solid var(--ink);border-radius:14px;background:var(--bg)}
@@ -227,6 +237,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <div class="tiles">
       <button class="tile sticker" data-go="flash"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Think of the answer FIRST, then flip. No peeking, no cheating, no llamas.</p></button>
       <button class="tile sticker" data-go="boss"><span class="duo" id="tileduo"></span><h3>Penalty Shootout</h3><p>Messi shoots, Dibu saves. Answer right to score (and to stop Inertia FC from scoring).</p></button>
+      <button class="tile sticker" data-go="calc"><span class="big">🧮</span><h3>Number Crunch</h3><p>Real test-style math: type your answer for KE, PE, F = ma, momentum and more. Fresh numbers every time.</p></button>
       <button class="tile sticker" data-go="coaster"><span class="big">🎢</span><h3>Roller Coaster Lab</h3><p>Build your own coaster, pick a car, and launch it over the crocodile gap. Too slow and you crash!</p></button>
       <button class="tile sticker" data-go="power"><span class="big">⚡</span><h3>Power-Ups</h3><p>Every formula and unit on one cheat sheet. Look, then go test yourself.</p></button>
     </div>
@@ -253,6 +264,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
         <p class="lq-safe" id="lqsafe"></p>
         <div class="controls" id="lqcoupons" style="justify-content:flex-start"></div>
       </div>
+      <div class="lq-duo" id="lqduo" aria-hidden="true"></div>
     </div>
     <div id="lqbody"></div>
   </section>
@@ -275,6 +287,16 @@ input[type=range]{width:100%;accent-color:var(--pop)}
   <section id="boss" class="stage sticker" hidden>
     <div class="stage-head"><h2>Penalty Shootout</h2><button class="btn alt" data-go="home">Leave the stadium</button></div>
     <div id="bossbody"></div>
+  </section>
+
+  <!-- NUMBER CRUNCH -->
+  <section id="calc" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Number Crunch</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
+    <div class="lq-top"><div class="lq-info">
+      <div class="lq-level" id="cclevel"></div>
+      <p class="lq-safe" id="ccstats"></p></div>
+      <div class="lq-duo" id="ccduo" aria-hidden="true"></div></div>
+    <div id="ccbody"></div>
   </section>
 
   <!-- COASTER -->
@@ -348,9 +370,9 @@ drawXP();
 let toastT;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,1800)}
 
 /* ---------- nav ---------- */
-const views=["menu","ssmenu","flash","boss","coaster","power","lolly","sspower"];
+const views=["menu","ssmenu","flash","boss","coaster","power","lolly","sspower","calc"];
 let curMenu="ssmenu";
-function go(v,btn){if(v==="home")v=curMenu;if(v==="flash")FLASHDECK=btn?.dataset.deck==="ss"?SS_CARDS:CARDS;views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="lolly")startLolly();if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
+function go(v,btn){if(v==="home")v=curMenu;if(v==="flash")FLASHDECK=btn?.dataset.deck==="ss"?SS_CARDS:CARDS;views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="lolly")startLolly();if(v==="calc")startCalc();if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go,b)});
 document.querySelectorAll("[data-subj]").forEach(b=>b.onclick=()=>{curMenu=b.dataset.subj;document.querySelectorAll("[data-subj]").forEach(x=>x.setAttribute("aria-pressed",x===b));go(curMenu)});
 
@@ -662,8 +684,9 @@ const LOSS=[0,2,10,15,20];
 // Two right in a row → harder level; a miss → easier level. So progress only goes forward on net.
 const LADDER=[[50,"🐻","Gummy bear"],[100,"🪱","Sour worm"],[150,"🍫","Chocolate"],[200,"🧁","Cupcake"],[250,"🍩","Donut"],[300,"🍭","LOLLIPOP TROPHY"]];
 const LEVELS=["","Sprinkle (easy)","Gumdrop","Jawbreaker","Mega Jawbreaker (hard)"];
-const LQ_RIGHT=["Sweet!","Nailed it! Hammurabi would put that in his code.","Correct! Sargon is impressed.","Yes! Write that on a clay tablet.","Big brain, Mesopotamian edition."];
-const LQ_WRONG=["Not quite, but you're safe. Here's the answer:","Oops! No worries, here's how it works:","Close! Let's lock it in:"];
+const LQ_RIGHT=["Messi: GOOOOL! What a golazo of an answer!","Messi: Top corner! Sargon is impressed.","Messi: Even Hammurabi would carve that into his code.","Messi: ¡Vamos, Remi! Write that on a clay tablet.","Messi: That's a World Cup answer right there."];
+const LQ_WRONG=["Dibu dives and saves most of your points! Here's the answer:","Dibu: No pasa nada! Here's how it works:","Dibu: I've got your back. Lock this one in:"];
+const lqDuo=(m="idle",d="idle")=>{$("#lqduo").innerHTML=messi(m)+dibu(d)};
 let L;
 function lqLoad(){try{L=JSON.parse(localStorage.getItem("remi-lolly"))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.recent=[];L.redo=[];L.since=0}
 function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem("remi-lolly",JSON.stringify(k))}catch(e){}}
@@ -676,7 +699,7 @@ function drawLq(){
     return `<li class="${got?"got":nxt?"next":""}">${e} ${v}${n===300?" "+name:""}</li>`}).join("");
   $("#lqcoupons").innerHTML=Array.from({length:L.trophies},(_,i)=>i+1).map(n=>`<button class="btn ${L.cashed?.[n]?"alt":"lime"}" data-coupon="${n}">🍭 Trophy #${n}: ${L.cashed?.[n]?"view coupon":"cash in!"}</button>`).join("");
   $("#lqcoupons").querySelectorAll("[data-coupon]").forEach(b=>b.onclick=()=>lqCoupon(+b.dataset.coupon));
-  $("#lqsafe").textContent=L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn, and you get an easier question next.";
+  $("#lqsafe").textContent=L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn.";
 }
 function startLolly(){if(!L)lqLoad();drawLq();lqAsk()}
 function lqPick(){
@@ -685,7 +708,7 @@ function lqPick(){
   L.recent=[];return pick(SS_QS);
 }
 function lqAsk(){
-  const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,SS_QS.length-4))L.recent.shift();
+  lqDuo();const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,SS_QS.length-4))L.recent.shift();
   const order=shuffle(q.ch.map((c,i)=>i)),gain=10*L.lv;
   $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">+${gain}</span>${q.q}</p>
     <div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${q.ch[i]}</button>`).join("")}</div><div id="lqafter"></div>`;
@@ -697,22 +720,24 @@ function lqAnswer(q,ok,btn){
   if(ok){L.pts+=10*lv;L.streak++;msg=pick(LQ_RIGHT);addXP(5);
     if(L.streak>=2&&L.lv<4){L.lv++;L.streak=0;note=`Level up! Next questions are ${LEVELS[L.lv]}.`}}
   else{btn.classList.add("wrong");L.pts=Math.max(L.ckpt,L.pts-LOSS[lv]);L.streak=0;msg=pick(LQ_WRONG);if(!L.redo.includes(q))L.redo.push(q);
-    if(L.lv>1){L.lv--;note="Next one is a little easier. You've got this."}}
+    if(L.lv>1)L.lv--;}
   const newCk=Math.floor(L.pts/50)*50;let ckMsg="";
   if(newCk>L.ckpt){L.ckpt=newCk;const c=LADDER.find(([n])=>n===newCk-300*L.trophies);if(c&&c[0]<300)ckMsg=`Checkpoint! You earned a ${c[2]} ${c[1]}. Points can't drop below ${newCk} now.`}
   const won=L.pts>=lqGoal();lqSave();
+  lqDuo(ok?"celebrate":"idle",ok?"idle":"dance");
+  if(!ok&&L.pts===before)msg="DIBU SAVES IT! Your checkpoint kept every point. Here's the answer:";
   const d=L.pts-before;
   $("#pop").classList.remove("bump");void $("#pop").offsetWidth;if(ok)$("#pop").classList.add("bump");
   drawLq();
-  $("#lqafter").innerHTML=`<div class="explain"><b>${msg} <span class="delta ${d>=0?"up":"down"}">${d>0?"+"+d:d<0?d:"±0 (checkpoint saved you!)"}</span></b>${q.why}${note?`<br><i>${note}</i>`:""}${ckMsg?`<br><b style="font-size:17px">${ckMsg}</b>`:""}</div>
+  $("#lqafter").innerHTML=`<div class="explain"><b>${msg} <span class="delta ${d>=0?"up":"down"}">${d>0?"+"+d:d<0?d:"±0"}</span></b>${q.why}${note?`<br><i>${note}</i>`:""}${ckMsg?`<br><b style="font-size:17px">${ckMsg}</b>`:""}</div>
     <div class="controls" style="margin-top:12px"><button class="btn sun" id="lqnext">${won?"Claim your trophy!":"Next question"}</button></div>`;
   $("#lqnext").focus();$("#lqnext").onclick=won?lqTrophy:lqAsk;
 }
 function lqTrophy(){
   L.trophies++;lqSave();addXP(50);confetti();
-  $("#lqbody").innerHTML=`<div class="end"><div class="trophy" aria-hidden="true"><div class="pop-head"></div><div class="cup">REMI</div><div class="base"></div></div>
+  $("#lqbody").innerHTML=`<div class="end"><div class="duo" aria-hidden="true">${messi("celebrate")}<div class="trophy"><div class="pop-head"></div><div class="cup">REMI</div><div class="base"></div></div>${dibu("dance")}</div>
     <h3 style="font-size:30px">You won the Lollipop Trophy${L.trophies>1?" #"+L.trophies:""}!</h3>
-    <p style="margin:0;font-weight:700">${L.pts} points. Sargon conquered Sumer; you conquered Mesopotamia. Keep going for trophy #${L.trophies+1}!</p>
+    <p style="margin:0;font-weight:700">${L.pts} points. Messi and Dibu are lifting you up! Sargon conquered Sumer; you conquered Mesopotamia. Keep going for trophy #${L.trophies+1}!</p>
     <div class="controls"><button class="btn lime" id="lqcash">Cash it in for a REAL lollipop!</button><button class="btn pink" id="lqmore">Keep going</button></div></div>`;
   drawLq();$("#lqmore").onclick=lqAsk;$("#lqcash").onclick=()=>lqCoupon(L.trophies);
 }
@@ -725,6 +750,7 @@ function lqCoupon(n){
       <div class="coupon-top">🍭 OFFICIAL LOLLIPOP COUPON 🍭</div>
       <p class="coupon-big">Good for ONE real lollipop</p>
       <p>Earned by <b>Remi</b> for winning Lollipop Trophy #${n} in Mesopotamia.</p>
+      <p class="coupon-small">Approved by Messi #10 and Dibu #23 ⚽🧤</p>
       <p class="coupon-code">${c.code}</p>
       <p class="coupon-small">Cashed in on ${c.when}. Show this to a grown-up to collect!</p>
     </div>
@@ -732,6 +758,68 @@ function lqCoupon(n){
     <button class="btn pink" id="lqmore">Back to the quest</button></div>`;
   if(first)confetti();drawLq();
   $("#lqmore").onclick=lqAsk;
+}
+
+/* ---------- number crunch (typed-answer science problems) ---------- */
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const fmt=x=>(Math.round(x*100)/100).toLocaleString("en-US",{maximumFractionDigits:2});
+const g=9.8;
+// each generator returns {q, given:[...], unit, ans, hint, steps:[...]}
+const GEN={1:[
+ ()=>{const m=ri(1,10),h=ri(2,12),A=m*g*h;return{q:`A ${m} kg backpack sits on a shelf ${h} m high. What is its potential energy?`,given:[`m = ${m} kg`,`h = ${h} m`,`g = 9.8 m/s²`],unit:"J",ans:A,hint:"PE = m × g × h",steps:[`PE = m × g × h`,`PE = ${m} × 9.8 × ${h}`,`PE = ${fmt(A)} J`]}},
+ ()=>{const m=2*ri(1,6),v=ri(2,10),A=0.5*m*v*v;return{q:`A ${m} kg skateboarder rolls at ${v} m/s. What is their kinetic energy?`,given:[`m = ${m} kg`,`v = ${v} m/s`],unit:"J",ans:A,hint:"KE = ½ × m × v². Square the speed first!",steps:[`KE = ½ × m × v²`,`v² = ${v} × ${v} = ${v*v}`,`KE = 0.5 × ${m} × ${v*v} = ${fmt(A)} J`]}},
+ ()=>{const m=ri(2,20),a=ri(1,9),A=m*a;return{q:`A ${m} kg cart accelerates at ${a} m/s². What net force is acting on it?`,given:[`m = ${m} kg`,`a = ${a} m/s²`],unit:"N",ans:A,hint:"F = m × a",steps:[`F = m × a`,`F = ${m} × ${a} = ${A} N`]}},
+ ()=>{const m=ri(2,15),v=ri(2,12),A=m*v;return{q:`A ${m} kg soccer robot moves at ${v} m/s. What is its momentum?`,given:[`m = ${m} kg`,`v = ${v} m/s`],unit:"kg·m/s",ans:A,hint:"p = m × v",steps:[`p = m × v`,`p = ${m} × ${v} = ${A} kg·m/s`]}},
+ ()=>{const F1=ri(6,30),F2=ri(1,F1-1),A=F1-F2;return{q:`A box is pushed ${F1} N to the right and ${F2} N to the left. What is the size of the net force?`,given:[`${F1} N →`,`← ${F2} N`],unit:"N",ans:A,hint:"Opposite directions: subtract. The net force points toward the bigger push.",steps:[`Opposite directions, so subtract`,`${F1} − ${F2} = ${A} N (to the right)`]}},
+ ()=>{const v=ri(2,12),t=ri(2,10),d=v*t;return{q:`A ball rolls ${d} m in ${t} s. What is its average speed?`,given:[`distance = ${d} m`,`time = ${t} s`],unit:"m/s",ans:v,hint:"speed = distance ÷ time",steps:[`speed = distance ÷ time`,`speed = ${d} ÷ ${t} = ${v} m/s`]}},
+],2:[
+ ()=>{const m=ri(2,12),a=ri(2,9),F=m*a;return{q:`A ${F} N net force pushes a ${m} kg sled. What is its acceleration?`,given:[`F = ${F} N`,`m = ${m} kg`],unit:"m/s²",ans:a,hint:"F = m × a, so a = F ÷ m",steps:[`a = F ÷ m`,`a = ${F} ÷ ${m} = ${a} m/s²`]}},
+ ()=>{const m=ri(2,25),a=ri(2,8),F=m*a;return{q:`A ${F} N net force makes a wagon accelerate at ${a} m/s². What is the wagon's mass?`,given:[`F = ${F} N`,`a = ${a} m/s²`],unit:"kg",ans:m,hint:"F = m × a, so m = F ÷ a",steps:[`m = F ÷ a`,`m = ${F} ÷ ${a} = ${m} kg`]}},
+ ()=>{const m=ri(2,20),v=ri(2,15),p=m*v;return{q:`A ${m} kg scooter has a momentum of ${p} kg·m/s. How fast is it going?`,given:[`p = ${p} kg·m/s`,`m = ${m} kg`],unit:"m/s",ans:v,hint:"p = m × v, so v = p ÷ m",steps:[`v = p ÷ m`,`v = ${p} ÷ ${m} = ${v} m/s`]}},
+ ()=>{const m=ri(1,10),h=ri(2,15),PE=m*g*h;return{q:`A ${m} kg pumpkin has ${fmt(PE)} J of potential energy. How high up is it?`,given:[`PE = ${fmt(PE)} J`,`m = ${m} kg`,`g = 9.8 m/s²`],unit:"m",ans:h,hint:"PE = m × g × h, so h = PE ÷ (m × g)",steps:[`h = PE ÷ (m × g)`,`m × g = ${m} × 9.8 = ${fmt(m*g)}`,`h = ${fmt(PE)} ÷ ${fmt(m*g)} = ${h} m`]}},
+ ()=>{const a=ri(8,25),b=ri(3,15),c=ri(2,a+b-1),A=a+b-c;return{q:`Two kids push a car to the right with ${a} N and ${b} N. Friction pushes left with ${c} N. What is the size of the net force?`,given:[`${a} N →`,`${b} N →`,`← ${c} N`],unit:"N",ans:A,hint:"Add forces in the same direction, then subtract the opposite one.",steps:[`Right: ${a} + ${b} = ${a+b} N`,`Net: ${a+b} − ${c} = ${A} N`]}},
+ ()=>{const KE=ri(2,12)*10,k=pick([2,3]);return{q:`A wrecking ball has ${KE} J of kinetic energy. If its SPEED becomes ${k} times bigger (same mass), what is its new KE?`,given:[`KE = ${KE} J`,`speed × ${k}`],unit:"J",ans:KE*k*k,hint:"Speed is squared in KE = ½mv², so KE grows by the speed factor squared.",steps:[`KE grows by ${k}² = ${k*k}`,`${KE} × ${k*k} = ${KE*k*k} J`]}},
+ ()=>{const KE=ri(2,12)*10,k=pick([2,3]);return{q:`A wrecking ball has ${KE} J of kinetic energy. If its MASS becomes ${k} times bigger (same speed), what is its new KE?`,given:[`KE = ${KE} J`,`mass × ${k}`],unit:"J",ans:KE*k,hint:"Mass is NOT squared, so KE grows by the same factor as the mass.",steps:[`KE grows by ${k} (mass isn't squared)`,`${KE} × ${k} = ${KE*k} J`]}},
+],3:[
+ ()=>{const m=ri(2,8),a=ri(2,6),F=m*a,t=ri(2,6),v=a*t,p=m*v;return{q:`A ${m} kg delivery drone starts at rest. A net upward force of ${F} N acts for ${t} s. What is its momentum at the end?`,given:[`m = ${m} kg`,`F = ${F} N`,`t = ${t} s`,`starts at rest`],unit:"kg·m/s",ans:p,hint:"Step 1: a = F ÷ m. Step 2: v = a × t. Step 3: p = m × v.",steps:[`a = F ÷ m = ${F} ÷ ${m} = ${a} m/s²`,`v = a × t = ${a} × ${t} = ${v} m/s`,`p = m × v = ${m} × ${v} = ${p} kg·m/s`]}},
+ ()=>{const m=ri(5,20)*100,v=ri(10,30),t=pick([2,4,5]),p=m*v,F=p/t;return{q:`A ${m.toLocaleString()} kg car with momentum ${p.toLocaleString()} kg·m/s brakes to a stop in ${t} s. What is the size of the braking force?`,given:[`m = ${m.toLocaleString()} kg`,`p = ${p.toLocaleString()} kg·m/s`,`t = ${t} s`],unit:"N",ans:F,hint:"Step 1: v = p ÷ m. Step 2: a = v ÷ t. Step 3: F = m × a.",steps:[`v = p ÷ m = ${p.toLocaleString()} ÷ ${m.toLocaleString()} = ${v} m/s`,`a = v ÷ t = ${v} ÷ ${t} = ${fmt(v/t)} m/s²`,`F = m × a = ${m.toLocaleString()} × ${fmt(v/t)} = ${fmt(F)} N`]}},
+ ()=>{const gm=pick([200,250,400,500,600,800]),v=ri(2,8),m=gm/1000,A=0.5*m*v*v;return{q:`A ${gm} g ball is thrown at ${v} m/s. What is its kinetic energy? (Careful with the units!)`,given:[`m = ${gm} g`,`v = ${v} m/s`],unit:"J",ans:A,hint:"Change grams to kilograms first: divide by 1,000. Then KE = ½ × m × v².",steps:[`m = ${gm} ÷ 1,000 = ${m} kg`,`v² = ${v*v}`,`KE = 0.5 × ${m} × ${v*v} = ${fmt(A)} J`]}},
+ ()=>{const m=ri(2,10)*50,h=ri(5,30),PE=m*g*h;return{q:`A ${m} kg roller coaster cart starts at rest on top of a ${h} m hill. With no friction, how much kinetic energy does it have at the bottom (height 0)?`,given:[`m = ${m} kg`,`h = ${h} m`,`no friction`],unit:"J",ans:PE,hint:"With no friction, all the PE at the top turns into KE at the bottom. So find PE = m × g × h.",steps:[`At the top: KE = 0, all energy is PE`,`PE = ${m} × 9.8 × ${h} = ${fmt(PE)} J`,`At the bottom all of it is KE: ${fmt(PE)} J`]}},
+ ()=>{const v=ri(4,20),t=pick([2,4,5]),a=v/t,m=ri(2,10),F=m*a;return{q:`A ${m} kg go-kart speeds up from 0 to ${v} m/s in ${t} s. What net force acted on it?`,given:[`m = ${m} kg`,`from 0 to ${v} m/s`,`t = ${t} s`],unit:"N",ans:F,hint:"Step 1: a = change in speed ÷ time. Step 2: F = m × a.",steps:[`a = ${v} ÷ ${t} = ${fmt(a)} m/s²`,`F = m × a = ${m} × ${fmt(a)} = ${fmt(F)} N`]}},
+ ()=>{const m=ri(2,10),v1=ri(2,6),k=2,KE1=0.5*m*v1*v1,KE2=0.5*m*(k*v1)**2;return{q:`A ${m} kg dog runs at ${v1} m/s, then speeds up to ${k*v1} m/s. By how many joules did its kinetic energy go UP?`,given:[`m = ${m} kg`,`v before = ${v1} m/s`,`v after = ${k*v1} m/s`],unit:"J",ans:KE2-KE1,hint:"Find KE before and KE after with KE = ½mv², then subtract.",steps:[`KE before = 0.5 × ${m} × ${v1*v1} = ${fmt(KE1)} J`,`KE after = 0.5 × ${m} × ${(k*v1)**2} = ${fmt(KE2)} J`,`Change = ${fmt(KE2)} − ${fmt(KE1)} = ${fmt(KE2-KE1)} J`]}},
+]};
+const CC_LV=["","Warm-up (one step)","Flip it (rearrange the formula)","Boss (two steps)"];
+let C={lv:1,streak:0,right:0,tries:0,cur:null,att:0};
+const ccDuo=(m="idle",d="idle")=>{$("#ccduo").innerHTML=messi(m)+dibu(d)};
+function drawCc(){$("#cclevel").innerHTML="Level: "+[1,2,3].map(i=>`<span class="chip ${i===C.lv?"on":""}">${CC_LV[i]}</span>`).join("");
+  $("#ccstats").textContent=`Solved ${C.right} of ${C.tries}. Get 3 in a row to level up. Round to 1 decimal place if you need to.`}
+function startCalc(){drawCc();ccNew()}
+function ccNew(){
+  C.cur=pick(GEN[C.lv])();C.att=0;ccDuo();const P=C.cur;
+  $("#ccbody").innerHTML=`<p class="q">${P.q}</p><div class="cc-given">${P.given.map(x=>`<span>${x}</span>`).join("")}</div>
+    <form class="cc-form" id="ccform" autocomplete="off"><label for="ccin" class="cc-unit">Answer:</label><input id="ccin" inputmode="decimal" placeholder="type a number"><span class="cc-unit">${P.unit}</span><button class="btn sun" type="submit">Check</button></form><div id="ccafter"></div>`;
+  $("#ccin").focus();$("#ccform").onsubmit=e=>{e.preventDefault();ccCheck()};
+}
+function ccOk(x,ans){return Math.abs(x-ans)<=Math.max(0.051,Math.abs(ans)*0.01)} // accepts normal rounding
+function ccCheck(){
+  const raw=$("#ccin").value.replace(/,/g,"").trim(),x=parseFloat(raw),P=C.cur;
+  if(raw===""||isNaN(x)){$("#ccafter").innerHTML=`<div class="explain"><b>Type a number first!</b>Just the number, no units needed.</div>`;return}
+  C.att++;
+  if(ccOk(x,P.ans)){
+    C.right++;C.tries++;C.streak++;addXP(C.att===1?10*C.lv:5);ccDuo("celebrate");
+    let up="";if(C.streak>=3&&C.lv<3){C.lv++;C.streak=0;up=`<br><i>Level up! Next: ${CC_LV[C.lv]}.</i>`}
+    $("#ccafter").innerHTML=`<div class="explain"><b>${pick(["Messi: GOOOOL! ","Messi: Top corner! ","Messi: Golazo! "])}${fmt(P.ans)} ${P.unit} is right.</b><ol class="steps">${P.steps.map(x=>`<li>${x}</li>`).join("")}</ol>${up}</div>
+      <div class="controls" style="margin-top:12px"><button class="btn sun" id="ccnext">Next problem</button></div>`;
+  }else if(C.att===1){
+    ccDuo("idle","dance");
+    $("#ccafter").innerHTML=`<div class="explain"><b>Dibu: Not quite, try once more!</b>Hint: ${P.hint}</div>`;$("#ccin").select();return;
+  }else{
+    C.tries++;C.streak=0;if(C.lv>1)C.lv--;ccDuo("idle","dance");
+    $("#ccafter").innerHTML=`<div class="explain"><b>Dibu: No pasa nada! Here's how to solve it:</b><ol class="steps">${P.steps.map(x=>`<li>${x}</li>`).join("")}</ol>The answer is <b style="display:inline;font-size:inherit">${fmt(P.ans)} ${P.unit}</b>.</div>
+      <div class="controls" style="margin-top:12px"><button class="btn sun" id="ccnext">Next problem</button></div>`;
+  }
+  $("#ccform").querySelectorAll("input,button").forEach(el=>el.disabled=true);
+  drawCc();$("#ccnext").focus();$("#ccnext").onclick=ccNew;
 }
 
 /* ---------- coaster ---------- */
