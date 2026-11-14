@@ -790,26 +790,112 @@ const ELA_CHEAT=[
 ];
 /*ELA_DATA_END*/
 $("#elacheat").innerHTML=ELA_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
+// ---- extra handwritten questions (mostly hard) ----
+SS_QS.push(
+{lv:2,q:"Which two mountain ranges are near Mesopotamia?",ch:["Alps and Andes","Zagros (east) and Taurus (north)","Rockies and Himalayas","Atlas and Urals"],a:1,why:"The Zagros Mountains are to the east and the Taurus Mountains to the north."},
+{lv:2,q:"Which body of water do the Tigris and Euphrates flow into?",ch:["The Red Sea","The Black Sea","The Persian Gulf","The Caspian Sea"],a:2,why:"They flow southeast into the Persian Gulf."},
+{lv:2,q:"What did Sumerian scribes write with?",ch:["A feather pen and ink","A sharpened reed called a stylus, on wet clay","Chalk on slate","A paintbrush on papyrus"],a:1,why:"A stylus pressed wedge shapes into damp clay tablets."},
+{lv:2,q:"Which metal mix did the Sumerians make for stronger tools?",ch:["Steel (iron + carbon)","Bronze (copper + tin)","Brass (copper + zinc)","Pure gold"],a:1,why:"Bronze is copper mixed with tin."},
+{lv:2,q:"Who usually got to go to school in Sumer?",ch:["Every child","Mostly boys from wealthy families","Only girls","Only enslaved people"],a:1,why:"Few people could read. Mostly rich boys trained to be scribes."},
+{lv:2,q:"What was at the very top of a ziggurat?",ch:["The king's bedroom","The home of the city's god, where only special priests could go","A market","A lookout for enemies"],a:1,why:"The top was the god's home. It also held storerooms and the treasury lower down."},
+{lv:2,q:"What was Sumer's most important contribution to the world?",ch:["The pyramid","Writing","Gunpowder","Paper money"],a:1,why:"Writing (cuneiform), the earliest known writing system."},
+{lv:2,q:"Which main crops did Sumerian farmers grow?",ch:["Rice and corn","Wheat, barley and dates","Potatoes and tomatoes","Coffee and cocoa"],a:1,why:"Wheat, barley and dates. They also raised sheep, goats and pigs."},
+{lv:2,q:"Which group was the LARGEST social class in Sumer?",ch:["The upper class","The middle class: merchants, farmers, fishers and artisans","Enslaved people","Priests"],a:1,why:"The free middle class was the biggest group."},
+{lv:2,q:"What is an artisan?",ch:["A ruler","A skilled craftsman","A farmer","A soldier"],a:1,why:"Artisans were skilled workers like potters and metalworkers, possible because of surplus food."},
+{lv:3,q:"Why did Sumerians build with mud brick instead of stone?",ch:["Mud was prettier","Stone and wood were scarce, but mud was everywhere","The gods banned stone","Stone was too light"],a:1,why:"Few natural resources. Mud mixed with reeds and dried in the sun worked."},
+{lv:3,q:"How did Sumerian kings say they got their power?",ch:["They won elections","It came from the city's god (\"down from heaven\")","They bought it","The people voted"],a:1,why:"Kings claimed their power came from the gods. That's why the government was theocratic."},
+{lv:3,q:"Why was Sumer's land described as \"unpredictable\" for farmers?",ch:["It snowed every week","Floods could come at the wrong time and wash away crops, while summers were hot and dry","There was too much rain all year","The ground was frozen"],a:1,why:"Spring floods could kill young crops and fall floods could destroy the harvest."},
+{lv:3,q:"What job did priests have BEFORE kings took over?",ch:["Only praying","Managing irrigation, storing surplus grain, collecting taxes and settling arguments","Leading the army","Building chariots"],a:1,why:"Priests were the first administrators. Later kings took over many of these jobs."},
+{lv:3,q:"Why is Hammurabi's Code famous even though it wasn't the first set of laws?",ch:["It was the shortest","It was carved in stone and survived, so we can still read it","It was written in English","It had no punishments"],a:1,why:"The 8-foot stone slab preserved all 282 laws."},
+{lv:3,q:"According to the teacher's slides, which statement about early city-states is TRUE?",ch:["They were all ruled by one emperor","Each independent city-state had its own king","They never fought","They had no walls"],a:1,why:"Each city-state was independent with its own ruler, until Sargon conquered them."},
+{lv:3,q:"Why did Hammurabi send governors, judges and tax collectors to all his lands?",ch:["To keep tight control of a huge empire","To go on vacation","Because he couldn't read","To start a war with Egypt"],a:0,why:"A strong central government with officials everywhere helped him hold the empire."},
+{lv:3,q:"Why did the Assyrians have trouble keeping control of conquered people?",ch:["They were too gentle","Their cruelty and forced relocations made conquered people hate them and rebel","They had no army","They forgot to collect taxes"],a:1,why:"Fear works for a while, but it built resentment that helped bring Assyria down."},
+{lv:3,q:"What did the Hittites and Kassites do around 1600 BC?",ch:["Invented writing","Invaded and took over Babylonia after Hammurabi's empire weakened","Built the first ziggurat","Founded Sumer"],a:1,why:"After Hammurabi died, his empire crumbled and these mountain peoples invaded."},
+{lv:3,q:"Why did the Sumerians develop a calendar?",ch:["To plan birthday parties","To know when to plant and when to hold religious ceremonies","To count gold","To track the king's age"],a:1,why:"Their 12-month calendar was based on the moon."},
+{lv:3,q:"Which shows that Sumerian society had social classes?",ch:["Everyone had the same house","Rich tombs had treasures, while ordinary people were buried with simple items","Everyone was a farmer","There were no kings"],a:1,why:"Burials show different levels of wealth and status."},
+{lv:3,q:"What made Shamshi-Adad different from a ruler who only used force?",ch:["He never fought","He also used trade (cloth for tin, copper and silver) to hold his lands together","He let every city be independent","He gave away his army"],a:1,why:"Conquest AND trade. That's a common CER claim."},
+{lv:3,q:"Which of these is evidence that Sumerians valued religion?",ch:["They built huge ziggurats at the center of each city","They had chariots","They traded with India","They used bronze"],a:0,why:"The ziggurat sat at the center of the city and took lots of organized labor to build."},
+{lv:3,q:"How did Cyrus the Great of Persia take over Babylonia?",ch:["He was elected","He conquered it around 539 BC and was welcomed by many people","He inherited it from Hammurabi","He bought it"],a:1,why:"Many Babylonians were unhappy with King Nabonidus, so they welcomed Cyrus."},
+{lv:3,q:"Why was King Nabonidus unpopular?",ch:["He was too generous","He left Babylon for years and tried to replace the god Marduk with the god Sin","He built the Hanging Gardens","He wrote too many laws"],a:1,why:"Unpopular choices weakened Babylon. That's one of the CER claims."},
+{lv:4,q:"A classmate says, \"Sumer had no government, just farmers.\" Which evidence BEST disproves this?",ch:["Sumerians grew barley","Priests and later kings ran irrigation, stored surplus, collected taxes and judged disputes","Sumerians liked board games","Sumer had rivers"],a:1,why:"Those are government jobs. That's the \"government & law\" characteristic."},
+{lv:4,q:"Which choice correctly shows CAUSE → EFFECT?",ch:["Writing → floods","Nomad attacks → military leaders became kings","Kings → rivers formed","Ziggurats → irrigation"],a:1,why:"War and raids caused cities to need full-time military leaders, who became kings."},
+{lv:4,q:"Which claim does this evidence support? \"Sargon tore down city walls and ruled all of Sumer from Akkad.\"",ch:["Sumerians invented the wheel","Sargon changed the way Mesopotamia was governed","Hammurabi used more than military strength","Maintaining an empire is easy"],a:1,why:"Going from independent walled city-states to one ruler is a change in government."},
+{lv:4,q:"Which piece of evidence supports: \"Hammurabi used more than military strength\"?",ch:["He had a big army","He made a public code of laws and sent officials to run his empire","He conquered Assyria","He was born in Babylon"],a:1,why:"Laws and officials are tools beyond the army. The other choices are about fighting or nothing."},
+{lv:4,q:"\"Maintaining an empire is as important as conquering one.\" Which example supports this?",ch:["Sargon conquered Sumer, but his empire fell apart from rebellions and invasions","Sumerians invented cuneiform","The Tigris flows south","Ziggurats were tall"],a:0,why:"Conquering wasn't enough. Without keeping control, Akkad collapsed."},
+{lv:4,q:"Which is the BEST reasoning for why irrigation led to social classes?",ch:["Water makes people rich","Irrigation created surplus, so some people did specialized jobs and some gained more wealth and power","Irrigation was invented by kings","Canals divided the city into neighborhoods"],a:1,why:"Surplus → specialized jobs → differences in wealth and power → social classes."},
+{lv:4,q:"Which of these is NOT a reason Sargon's empire declined?",ch:["City-states rebelled","The Gutians invaded","City-states wanted independence","The Tigris River dried up"],a:3,why:"The rivers didn't dry up. Rebellion and invasion did it."},
+{lv:4,q:"An empire is \"a large territory of conquered peoples ruled by one ruler.\" Which was the FIRST time this happened in Mesopotamia?",ch:["Sumer's city-states","Sargon's Akkadian Empire","Hammurabi's Babylonia","New Assyria"],a:1,why:"Sargon created the world's first empire. Before that, independent city-states."},
+{lv:4,q:"Which is the strongest piece of EVIDENCE (not a claim)?",ch:["Hammurabi was the best king ever","Hammurabi's Code had 282 laws carved on a stone slab","Babylon was cool","Laws are important"],a:1,why:"Evidence is a specific fact. The others are opinions or claims."},
+{lv:4,q:"Which pair is matched CORRECTLY?",ch:["Assyria = south, Babylonia = north","Assyria = north (Assur), Babylonia = south (Babylon)","Both in Egypt","Both in the Zagros Mountains"],a:1,why:"Assyria was in the north, centered on Assur. Babylonia was in the south, centered on Babylon."},
+{lv:4,q:"Which characteristic of civilization does Hammurabi's Code BEST show?",ch:["Public works","Government & law","Art","Specialized jobs"],a:1,why:"A law code is part of government & law (it's also writing, but law is the best fit)."},
+{lv:4,q:"Why would a historian say Mesopotamia's geography was BOTH a help and a problem?",ch:["Rivers brought water and silt, but floods were unpredictable and there were few resources","It had mountains and beaches","It was always cold","It had no rivers"],a:0,why:"Good soil and water, but surprise floods, heat, little rain, and little stone or wood."},
+{lv:4,q:"Which statement about enslaved people in Sumer is TRUE?",ch:["They had no rights at all","They were mostly prisoners of war, and could do business and even buy their freedom","They were the largest class","They ruled the city-states"],a:1,why:"Lowest class, but they had some rights."},
+{lv:4,q:"Which comes from the Sumerian number system based on 60?",ch:["Our 10-finger counting","60 minutes in an hour and 360 degrees in a circle","The 7-day week","Roman numerals"],a:1,why:"Base 60 gives us 60 seconds, 60 minutes and 360 degrees."},
+{lv:4,q:"Tiglath-Pileser III moved 30,000 conquered people far from home. What's the best CER-style reasoning about this?",ch:["It shows Assyria was peaceful","It stopped rebellions for a while, but made people hate Assyria, which contributed to its downfall","It had no effect","It made Assyria smaller"],a:1,why:"His policies made Assyria powerful but also built resentment, one of the CER claims."},
+{lv:4,q:"Which is the best order of how Sumerian writing changed?",ch:["Cuneiform → pictographs → tokens","Clay tokens & pictographs → symbols for sounds → wedge-shaped cuneiform","Alphabet → cuneiform","Cuneiform → alphabet → pictographs"],a:1,why:"Pictures first, then sound symbols, then cuneiform."},
+{lv:4,q:"Which choice is a claim that can be ARGUED (not just a fact)?",ch:["Hammurabi's Code had 282 laws","Hammurabi was the most successful Mesopotamian ruler","Babylon is in the south","Sargon ruled from Akkad"],a:1,why:"A claim is something you can argue or prove with evidence. The others are plain facts."},
+{lv:4,q:"Which empire's fall is described as \"military strength became its greatest weakness\"?",ch:["Sumer","New Assyria","Akkad under Sargon's grandsons","Persia"],a:1,why:"Assyria's cruel army created enemies who overthrew it in 612 BC."},
+{lv:4,q:"Which BEST explains why Nebuchadnezzar II made Babylon powerful \"at great cost to others\"?",ch:["He built the Hanging Gardens AND burned Jerusalem and sent thousands into exile","He invented the wheel","He let everyone go free","He lost every war"],a:0,why:"Babylon got grand while conquered people suffered."},
+);
+
+// ---- generators: fresh questions so nothing repeats ----
+const SS_EVENTS=[ // [event, year BC, exact?]
+["Early signs of irrigation",5000,0],["Writing and the wheel are invented",3500,0],["Gilgamesh rules Uruk",2700,0],
+["Sargon begins ruling Akkad",2334,1],["Shamshi-Adad rules Assyria",1813,1],["Hammurabi comes to power",1792,1],["Hammurabi dies",1750,1],
+["The Hittites invade",1600,0],["Tiglath-Pileser III takes the throne",744,1],["The Chaldeans and Medes overthrow Assyria",612,1],
+["Nebuchadnezzar II begins ruling",605,1],["Nebuchadnezzar burns Jerusalem",587,1],["Cyrus of Persia takes Babylon",539,1],["Alexander the Great conquers the region",333,1]];
+const SS_TERMS=[["irrigation","watering crops with canals from a water source"],["silt","rich soil left behind by floods"],["surplus","extra food not needed right away"],
+["city-state","a city plus the villages and farms it controls, with its own government"],["ziggurat","a huge temple that rises high; the top was the god's home"],
+["polytheism","belief in many gods"],["monarchy","rule by one ruler, with power passed down in the family"],["theocratic","when religion heavily influences government"],
+["cuneiform","wedge-shaped writing pressed into clay"],["pictograph","a picture that stands for a word or idea"],["scribe","a person who specialized in writing and record keeping"],
+["empire","a large territory of conquered peoples ruled by one ruler"],["epic","a long poem that tells the story of a hero"],["artisan","a skilled craftsman"],
+["nomads","people who move around with their herds"],["plateau","a broad area of high, flat land"],["plain","a broad area of flat, open land, lower than a plateau"],
+["public works","government projects that help the whole community"],["social classes","groups with different levels of wealth, power and status"],
+["exile","being forced to live away from your home country"],["famine","a terrible shortage of food"],["law code","a set of laws in a government"],["stylus","a sharpened reed used to write on clay"]];
+const SS_CHARS=[["a canal built by the government for everyone","Public works"],["a scribe keeping records on clay tablets","Writing & record keeping"],
+["a ziggurat for the city's god","Religion"],["the king, priests, and enslaved people having different status","Social classes"],["a potter and a metalworker who don't farm","Specialized jobs"],
+["Hammurabi's 282 laws","Government & law"],["a city built next to the Euphrates River","Cities & geography"],["the Standard of Ur mosaic and the wheel","Art, architecture & technology"],
+["a city wall built for everyone's protection","Public works"],["a king who rules with help from officials","Government & law"]];
+const CHAR_NAMES=["Cities & geography","Government & law","Specialized jobs","Social classes","Religion","Art, architecture & technology","Writing & record keeping","Public works"];
+const bc=y=>y.toLocaleString("en-US")+" BC",ca=e=>(e[2]?"":"c. ")+bc(e[1]);
+function mcq(lv,q,right,wrongs,why){const ch=shuffle([right,...wrongs]);return{lv,q,ch,a:ch.indexOf(right),why,gen:1}}
+function pickN(arr,n,ok=()=>true){for(let t=0;t<200;t++){const s=shuffle(arr).slice(0,n);if(ok(s))return s}return shuffle(arr).slice(0,n)}
+const spread=gap=>s=>s.every((a,i)=>s.every((b,j)=>i===j||Math.abs(a[1]-b[1])>=gap));
+const SS_GEN={
+1:[()=>{const[t,d]=pick(SS_TERMS),w=pickN(SS_TERMS.filter(x=>x[0]!==t),3).map(x=>x[0]);return mcq(1,`Which word means "${d}"?`,t,w,`${t[0].toUpperCase()+t.slice(1)}: ${d}.`)}],
+2:[()=>{const[t,d]=pick(SS_TERMS),w=pickN(SS_TERMS.filter(x=>x[0]!==t),3).map(x=>x[1]);return mcq(2,`What does "${t}" mean?`,d,w,`${t[0].toUpperCase()+t.slice(1)}: ${d}.`)},
+   ()=>{const[ex,c]=pick(SS_CHARS),w=pickN(CHAR_NAMES.filter(x=>x!==c),3);return mcq(2,`Which characteristic of civilization does this show: ${ex}?`,c,w,`${ex[0].toUpperCase()+ex.slice(1)} shows ${c.toLowerCase()}.`)}],
+3:[()=>{const s=pickN(SS_EVENTS,4,spread(150)),last=Math.random()<.5,ans=s.reduce((a,b)=>(last?b[1]<a[1]:b[1]>a[1])?b:a);
+     return mcq(3,`Which happened ${last?"LAST (most recent)":"FIRST (longest ago)"}?`,ans[0],s.filter(e=>e!==ans).map(e=>e[0]),
+     `${s.map(e=>`${e[0]}: ${ca(e)}`).join(". ")}. In BC, a bigger number means longer ago.`)}],
+4:[()=>{const s=pickN(SS_EVENTS,4,spread(25)),ord=s.slice().sort((a,b)=>b[1]-a[1]),fmt=o=>o.map(e=>e[0]).join(" → ");
+     const wr=[];for(let t=0;t<50&&wr.length<3;t++){const p=fmt(shuffle(s));if(p!==fmt(ord)&&!wr.includes(p))wr.push(p)}
+     return mcq(4,"Put these in time order, earliest first.",fmt(ord),wr,ord.map(e=>`${e[0]} (${ca(e)})`).join(" → ")+". Bigger BC number = earlier.")},
+   ()=>{const ex=SS_EVENTS.filter(e=>e[2]),[a,b]=pickN(ex,2,s=>Math.abs(s[0][1]-s[1][1])>=10).sort((x,y)=>y[1]-x[1]),d=a[1]-b[1];
+     return mcq(4,`"${a[0]}" was in ${bc(a[1])}. "${b[0]}" was in ${bc(b[1])}. How many years apart?`,d.toLocaleString("en-US")+" years",[...new Set([a[1]+b[1],d+100,d>100?d-100:d+50,d+10,d+20])].filter(x=>x!==d).slice(0,3).map(x=>x.toLocaleString("en-US")+" years"),
+     `Both are BC, so subtract: ${a[1]} − ${b[1]} = ${d}. (Don't add BC dates!)`)},
+   ()=>{const s=pickN(SS_EVENTS,4,spread(40)),ans=s.reduce((x,y)=>y[1]>x[1]?y:x);
+     return mcq(4,"Careful, these are close! Which happened FIRST?",ans[0],s.filter(e=>e!==ans).map(e=>e[0]),s.map(e=>`${e[0]}: ${ca(e)}`).join(". ")+".")}]};
+
 $("#sscheat").innerHTML=SS_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
 
 /* ---------- lollipop quest ---------- */
-// Points: right = GAIN[level] (only +1 for a question already answered right), a miss costs LOSS[level]
+// Points: right = GAIN[level], a miss costs LOSS[level]
 // (always less than a right answer earns), never below the last 50-point checkpoint.
-// The whole bank answered right once is worth ~280, so a trophy means learning every question.
 // At 300 the trophy gate needs 5 hardest questions right in a row (a miss just restarts the gate count).
 const GAIN=[0,2,3,5,8],LOSS=[0,0,1,2,3],GATE=5;
 // Two right in a row → harder level; a miss → easier level. So progress only goes forward on net.
 const LADDER=[[50,"🐻","Gummy bear"],[100,"🪱","Sour worm"],[150,"🍫","Chocolate"],[200,"🧁","Cupcake"],[250,"🍩","Donut"],[300,"🍭","LOLLIPOP TROPHY"]];
 const LEVELS=["","Sprinkle (easy)","Gumdrop","Jawbreaker","Mega Jawbreaker (hard)"];
 const QUESTS={
-  ss:{bank:()=>SS_QS,key:"remi-lolly",place:"Mesopotamia",win:"Sargon conquered Sumer; you conquered Mesopotamia.",cheer:["Messi: Top corner! Sargon is impressed.","Messi: Even Hammurabi would carve that into his code.","Messi: ¡Vamos, Remi! Write that on a clay tablet."]},
+  ss:{bank:()=>SS_QS,gen:SS_GEN,key:"remi-lolly",place:"Mesopotamia",win:"Sargon conquered Sumer; you conquered Mesopotamia.",cheer:["Messi: Top corner! Sargon is impressed.","Messi: Even Hammurabi would carve that into his code.","Messi: ¡Vamos, Remi! Write that on a clay tablet."]},
   ela:{bank:()=>ELA_QS,key:"remi-lolly-ela",place:"The Giver",win:"The Giver would give you this memory: a giant lollipop, in full color.",cheer:["Messi: Precision of language! Perfect answer.","Messi: The Committee of Elders assigns you: Champion.","Messi: ¡Vamos, Remi! You're seeing beyond."]}};
 let Q=QUESTS.ss;
 const LQ_RIGHT=["Messi: GOOOOL! What a golazo of an answer!","Messi: That's a World Cup answer right there.","Messi: Golazo!"];
 const LQ_WRONG=["Dibu dives and saves most of your points! Here's the answer:","Dibu: No pasa nada! Here's how it works:","Dibu: I've got your back. Lock this one in:"];
 const lqDuo=(m="idle",d="idle")=>{$("#lqduo").innerHTML=messi(m)+dibu(d)};
 let L;
-function lqLoad(){L=null;try{L=JSON.parse(localStorage.getItem(Q.key))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.mastered=L.mastered||[];L.gate=L.gate||0;L.recent=[];L.redo=[];L.since=0}
+function lqLoad(){L=null;try{L=JSON.parse(localStorage.getItem(Q.key))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.mastered=L.mastered||[];L.seen=L.seen||[];L.gate=L.gate||0;L.recent=[];L.redo=[];L.since=0}
 function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem(Q.key,JSON.stringify(k))}catch(e){}}
 function lqGoal(){return 300*(L.trophies+1)}
 function drawLq(){
@@ -823,17 +909,21 @@ function drawLq(){
   $("#lqsafe").textContent=L.gating?`TROPHY GATE: ${L.gate} of ${GATE} hardest questions right in a row. A miss just restarts the count.`:L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn.";
 }
 function startLolly(id){const nq=QUESTS[id]||Q;if(nq!==Q||!L){Q=nq;lqLoad()}drawLq();lqAsk()}
+// No repeats: every question asked is remembered (saved), and nothing comes back until everything has been seen.
+// Generated questions (timelines, BC math, vocab) keep the supply fresh.
+const lqKey=q=>q.gen?q.q+"|"+[...q.ch].sort().join("|"):q.q;
 function lqPick(){
-  const B=Q.bank();
-  if(L.gating){const pool=B.filter(q=>q.lv===4&&!L.recent.includes(q));return pick(pool.length?pool:B.filter(q=>q.lv===4))}
-  if(L.redo.length&&L.since>=3){L.since=0;return L.redo.shift()} // missed questions come back later
-  for(const fresh of [true,false]) // unmastered questions first
-    for(const d of [0,-1,1,-2,2]){const pool=B.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q)&&(!fresh||!L.mastered.includes(q.q)));if(pool.length)return pick(pool)}
-  L.recent=[];return pick(B);
+  const B=Q.bank(),G=Q.gen||{},seen=new Set(L.seen),want=L.gating?4:L.lv;
+  const levels=L.gating?[4]:[0,-1,1,-2,2,-3,3].map(d=>want+d).filter(l=>l>=1&&l<=4);
+  const genAt=lv=>{if(!G[lv])return null;for(let t=0;t<40;t++){const q=pick(G[lv])();if(!seen.has(lqKey(q)))return q}return null};
+  if(Math.random()<0.3)for(const lv of levels){const g=genAt(lv);if(g)return g} // ~30% generated for variety
+  for(const lv of levels){const fresh=B.filter(q=>q.lv===lv&&!seen.has(q.q));if(fresh.length)return pick(fresh)} // handwritten, nearest level first
+  for(const lv of levels){const g=genAt(lv);if(g)return g}
+  L.seen=[];return pick(B.filter(q=>q.lv===want)); // seen absolutely everything: start a new round
 }
-const lqWorth=q=>L.mastered.includes(q.q)?1:GAIN[L.lv];
+const lqWorth=q=>GAIN[L.lv];
 function lqAsk(){
-  lqDuo();const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,Q.bank().length-4))L.recent.shift();
+  lqDuo();const q=lqPick();L.recent=[q];L.seen.push(lqKey(q));if(L.seen.length>3000)L.seen.shift();lqSave();
   const order=shuffle(q.ch.map((c,i)=>i)),gain=L.gating?"GATE":"+"+lqWorth(q);
   $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">${gain}</span>${q.q}</p>
     <div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${q.ch[i]}</button>`).join("")}</div><div id="lqafter"></div>`;
@@ -843,9 +933,9 @@ function lqAnswer(q,ok,btn){
   $("#lqbody").querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(+b.dataset.i===q.a)b.classList.add("right")});
   if(L.gating)return lqGateAnswer(q,ok,btn);
   const lv=L.lv,before=L.pts,worth=lqWorth(q);let msg,note="";L.since++;
-  if(ok){L.pts+=worth;L.streak++;msg=pick(LQ_RIGHT);addXP(2);if(!L.mastered.includes(q.q))L.mastered.push(q.q);
+  if(ok){L.pts+=worth;L.streak++;msg=pick(LQ_RIGHT);addXP(2);
     if(L.streak>=2&&L.lv<4){L.lv++;L.streak=0;note=`Level up! Next questions are ${LEVELS[L.lv]}.`}}
-  else{btn.classList.add("wrong");L.pts=Math.max(L.ckpt,L.pts-LOSS[lv]);L.streak=0;msg=pick(LQ_WRONG);if(!L.redo.includes(q))L.redo.push(q);
+  else{btn.classList.add("wrong");L.pts=Math.max(L.ckpt,L.pts-LOSS[lv]);L.streak=0;msg=pick(LQ_WRONG);
     if(L.lv>1)L.lv--;}
   const newCk=Math.floor(L.pts/50)*50;let ckMsg="";
   if(newCk>L.ckpt){L.ckpt=newCk;const c=LADDER.find(([n])=>n===newCk-300*L.trophies);if(c&&c[0]<300)ckMsg=`Checkpoint! You earned a ${c[2]} ${c[1]}. Points can't drop below ${newCk} now.`}
