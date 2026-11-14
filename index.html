@@ -228,7 +228,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <button class="subj sticker" aria-pressed="false" data-subj="menu"><b>Science</b><small>Unit 1: Forces &amp; Energy</small></button>
     <button class="subj sticker" aria-pressed="true" data-subj="ssmenu"><b>Social Studies</b><small>Mesopotamia</small></button>
     <button class="subj sticker" disabled><b>Math</b><small>Squirrels still building this level</small></button>
-    <button class="subj sticker" disabled><b>ELA</b><small>Coming soon</small></button>
+    <button class="subj sticker" aria-pressed="false" data-subj="elamenu"><b>ELA</b><small>The Giver</small></button>
   </nav>
 
   <section id="menu" class="unit" hidden>
@@ -247,10 +247,25 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     <h2 style="font-size:30px">Land Between the Rivers</h2>
     <p>Mesopotamia test on Monday, Nov 16. Climb the candy ladder to win the Lollipop Trophy.</p>
     <div class="tiles">
-      <button class="tile sticker" data-go="lolly"><span class="big">🍭</span><h3>Lollipop Quest</h3><p>Questions get harder as you go. Every 50 points is a checkpoint you can never fall below. Reach 300 for the trophy!</p></button>
+      <button class="tile sticker" data-go="lolly" data-quest="ss"><span class="big">🍭</span><h3>Lollipop Quest</h3><p>Questions get harder as you go. Every 50 points is a checkpoint you can never fall below. Reach 300 for the trophy!</p></button>
       <button class="tile sticker" data-go="flash" data-deck="ss"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Every Mesopotamia word and person. Say it before you flip!</p></button>
       <button class="tile sticker" data-go="sspower"><span class="big">📜</span><h3>Cheat Sheet</h3><p>The whole unit on one page: rivers, Sumer, kings and empires.</p></button>
     </div>
+  </section>
+
+  <section id="elamenu" class="unit" hidden>
+    <h2 style="font-size:30px">The Giver</h2>
+    <p id="elasub">Get ready for The Giver: the world of the community, the rules, and the big ideas.</p>
+    <div class="tiles">
+      <button class="tile sticker" data-go="boss" data-bank="ela"><span class="duo" id="tileduo2"></span><h3>Giver Shootout</h3><p>Messi shoots, Dibu saves, against Inertia FC. Questions get harder as the match goes on.</p></button>
+      <button class="tile sticker" data-go="flash" data-deck="ela"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Characters, community words and big ideas. Say it before you flip!</p></button>
+      <button class="tile sticker" data-go="elapower"><span class="big">📖</span><h3>Reader's Guide</h3><p>Who's who, how the community works, and what to think about for the book discussion.</p></button>
+    </div>
+  </section>
+
+  <section id="elapower" class="stage sticker" hidden>
+    <div class="stage-head"><h2>The Giver Reader's Guide</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
+    <div class="powerups" id="elacheat"></div>
   </section>
 
   <!-- LOLLIPOP QUEST -->
@@ -370,9 +385,9 @@ drawXP();
 let toastT;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,1800)}
 
 /* ---------- nav ---------- */
-const views=["menu","ssmenu","flash","boss","coaster","power","lolly","sspower","calc"];
+const views=["menu","ssmenu","elamenu","flash","boss","coaster","power","lolly","sspower","elapower","calc"];
 let curMenu="ssmenu";
-function go(v,btn){if(v==="home")v=curMenu;if(v==="flash")FLASHDECK=btn?.dataset.deck==="ss"?SS_CARDS:CARDS;views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="lolly")startLolly();if(v==="calc")startCalc();if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
+function go(v,btn){if(v==="home")v=curMenu;if(v==="flash")FLASHDECK={ss:SS_CARDS,ela:ELA_CARDS}[btn?.dataset.deck]||CARDS;views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="lolly")startLolly(btn?.dataset.quest);if(v==="calc")startCalc();if(v==="flash")startFlash();if(v==="boss"){BOSSQ=btn?.dataset.bank==="ela";startBoss()}if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go,b)});
 document.querySelectorAll("[data-subj]").forEach(b=>b.onclick=()=>{curMenu=b.dataset.subj;document.querySelectorAll("[data-subj]").forEach(x=>x.setAttribute("aria-pressed",x===b));go(curMenu)});
 
@@ -496,18 +511,24 @@ function dibu(cls="idle"){const sk="#f0c19b",hair="#2b211c",kit="#d7f23a";return
 <path d="M37 44Q50 58 63 44Z" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M47 50q3 6 7 0" fill="#ff5d8f"/>
 </svg>`}
 const potato=(cls="idle")=>`<span class="potato ${cls}" aria-hidden="true">🥔</span>`;
-$("#tileduo").innerHTML=messi()+dibu();
+$("#tileduo").innerHTML=$("#tileduo2").innerHTML=messi()+dibu();
+let BOSSQ=null;
+function elaMatch(){ // 3 easy, 3 medium, 2 hard, 2 hardest, then the rest for sudden death
+  const by=[1,2,3,4].map(l=>shuffle(ELA_QS.filter(q=>q.lv===l))),take=[3,3,2,2];
+  const main=by.flatMap((b,i)=>b.slice(0,take[i])),rest=shuffle(by.flatMap((b,i)=>b.slice(take[i])));
+  return main.concat(rest).map(q=>[q.q,q.ch,q.a,q.why]);
+}
 
 const GOAL=["GOOOOL! Messi, left foot, top corner. The keeper didn't even move (inertia).","Messi dribbles past four potatoes and taps it in.","GOAL! That ball had a LOT of kinetic energy.","Messi chips it. Pure art. Pure physics."];
 const MISS=["Saved! The Inertia FC keeper is a very large potato.","Off the post! Read the why and fix the aim.","Over the bar. Into orbit. Ask DART to go get it."];
 const SAVE=["DIBU SAVES IT! Then does a little dance.","Dibu dives! Equal and opposite reaction on that glove.","NOT TODAY. Dibu stops it and stares the striker down.","Dibu blocks it with his face. He's fine. He's Dibu."];
 const CONCEDE=["Inertia FC scores. A potato is celebrating. Gross.","Dibu went the wrong way. Read the why for the rematch.","Goal for the potatoes. Unacceptable. Revenge time."];
 const ROUNDS=10;let bq,bi,rd,us,them,log;
-function startBoss(){bq=shuffle(QS);bi=0;rd=0;us=0;them=0;log=[];bossTurn()}
+function startBoss(){bq=BOSSQ?elaMatch():shuffle(QS);bi=0;rd=0;us=0;them=0;log=[];bossTurn()}
 function bossTurn(){
   const B=$("#bossbody"),pairs=Math.floor(rd/2);
   if(rd>=ROUNDS&&rd%2===0&&us!==them)return bossEnd();
-  if(bi>=bq.length){bq=bq.concat(shuffle(QS));}
+  if(bi>=bq.length){bq=bq.concat(BOSSQ?elaMatch():shuffle(QS));}
   const atk=rd%2===0,[q,ch,ans,why]=bq[bi],order=shuffle(ch.map((c,i)=>i));
   const tag=rd>=ROUNDS?"SUDDEN DEATH":`Kick ${pairs+1} of ${ROUNDS/2}`;
   B.innerHTML=`<div class="score"><div class="kits"><span class="kit ${atk?"on":"off"}">Messi 10</span><span class="kit ${atk?"off":"on"}">Dibu 23</span></div>
@@ -676,6 +697,99 @@ const SS_CHEAT=[
 ["CER paragraphs","<b>Claim</b>: something you can argue. <b>Evidence</b>: at least 2 facts with page numbers. <b>Reasoning</b>: explain how the evidence proves the claim. Don't just drop in a quote!"],
 ];
 /*SS_DATA_END*/
+/*ELA_DATA_START*/
+const ELA_CARDS=[
+["Utopia","An imagined place where everything is perfect, especially its government and society."],
+["Dystopia","An imagined society with great suffering or injustice, often totalitarian (one total ruler/government) or post-apocalyptic."],
+["u- / ou-","Prefix meaning \"not.\" Utopia = \"no place\": a perfect place can't really exist."],
+["dys-","Prefix meaning \"not, bad.\" Dystopia = \"bad place.\""],
+["-topo / topos","Means \"place.\""],
+["Who coined \"utopia\"?","Thomas More, in his book Utopia (1516)."],
+["Traits of a dystopia","Government controls everything, people lose freedom, censorship, surveillance, propaganda, harsh punishment for small rule-breaking, everyone conforms, fear of the outside world."],
+["Dystopian protagonist","A rebel who questions the rules and clashes with authority, and discovers who they really are. A symbol of hope and resistance."],
+["Why set dystopias in the future?","As a cautionary warning: there's still time to make a better future."],
+["Author's purpose: dystopia","Warn readers, challenge authority, spark critical thinking about rules we follow, and show human resilience."],
+["Author's purpose: utopia","Inspire hope, offer solutions, and explore ideal human values."],
+["Conformity","Everyone acting, dressing and thinking the same way, following the rules without question."],
+["Propaganda","Information used to make people believe something, like the idea that their society is perfect."],
+["Apprehensive","Worried or nervous about something that is going to happen. Jonas picks this exact word for how he feels about the Ceremony of Twelve."],
+["Jonas","The main character, an Eleven. He's apprehensive about the Ceremony of Twelve, where he'll get his Assignment."],
+["Lily","Jonas's little sister, a Seven. Chatty and full of opinions."],
+["Father (Jonas's)","A Nurturer: he takes care of the newchildren."],
+["Mother (Jonas's)","Works at the Department of Justice."],
+["Gabe (Gabriel)","A newchild Father is caring for. He isn't growing well, so Father brings him home at night. He has pale eyes, like Jonas."],
+["Asher","Jonas's best friend. Funny, often late, and mixes up his words."],
+["Release","When someone is sent away from the community, forever. It sounds gentle but it's treated as terrible."],
+["Ceremony of Twelve","In December, each Eleven turns Twelve and gets an Assignment: their job for life, picked by the Committee of Elders."],
+["Committee of Elders","The leaders who make the community's decisions, including everyone's Assignment."],
+["Telling of feelings","The family ritual every night after dinner: each person shares a feeling from the day and the others help them understand it."],
+["Family unit","Two parents (matched by the community), one boy and one girl. Children are assigned to families, not born into them."],
+["Precision of language","Using exactly the right word. The community cares a LOT about it."],
+];
+
+// lv 1 = recall, 2 = understand, 3 = why, 4 = deeper thinking (ordered easy → hard in the shootout)
+const ELA_QS=[
+// ---- Level 1 ----
+{lv:1,q:"What is a utopia?",ch:["A perfect imagined place","A place full of suffering","A real country in Europe","A type of poem"],a:0,why:"A utopia is an imagined place where everything is perfect."},
+{lv:1,q:"What is a dystopia?",ch:["A perfect world","An imagined society with great suffering or injustice","A happy fairy tale","A science textbook"],a:1,why:"Dys = bad. A dystopia is a \"bad place\" with suffering or injustice."},
+{lv:1,q:"What does the prefix \"dys-\" mean?",ch:["Good","Many","Not, bad","Place"],a:2,why:"dys- means \"not, bad.\" Topos means \"place.\""},
+{lv:1,q:"What does \"topos\" mean in utopia and dystopia?",ch:["Top","Place","Time","People"],a:1,why:"Topos = place. Utopia = no place; dystopia = bad place."},
+{lv:1,q:"Who is the main character of The Giver?",ch:["Asher","Gabe","Jonas","Lily"],a:2,why:"Jonas, an Eleven who is about to become a Twelve."},
+{lv:1,q:"What is Jonas's father's job?",ch:["Pilot","Nurturer (cares for newchildren)","Judge","Teacher"],a:1,why:"He's a Nurturer. He takes care of the newchildren."},
+{lv:1,q:"Who is Gabe?",ch:["Jonas's best friend","A newchild Father is caring for","Jonas's teacher","The Chief Elder"],a:1,why:"Gabriel (Gabe) is a newchild who isn't growing well, so Father brings him home at night."},
+{lv:1,q:"Who is Lily?",ch:["Jonas's mother","Jonas's little sister","A pilot","Asher's sister"],a:1,why:"Lily is Jonas's younger sister, a Seven."},
+{lv:1,q:"What word does Jonas choose for how he feels about the upcoming Ceremony?",ch:["Excited","Frightened","Apprehensive","Bored"],a:2,why:"Apprehensive: worried about something that's going to happen. He picks the word carefully."},
+{lv:1,q:"Where does Jonas's mother work?",ch:["The Department of Justice","The hospital","The school","The bakery"],a:0,why:"She has an important job at the Department of Justice."},
+{lv:1,q:"Which of these is a DYSTOPIA, according to the class slides?",ch:["Zootopia","Wakanda","The Hunger Games","None of them"],a:2,why:"The Hunger Games (also Divergent, The Maze Runner and Wall-E's ship). Zootopia and Wakanda were utopias."},
+{lv:1,q:"Who is Jonas's best friend?",ch:["Asher","Gabe","The Giver","Lily"],a:0,why:"Asher: funny, often late, and mixes up his words."},
+// ---- Level 2 ----
+{lv:2,q:"What does Jonas's family do every night after dinner?",ch:["Watch TV","Share their feelings from the day","Go for a bike ride","Do homework together"],a:1,why:"The telling of feelings: everyone shares a feeling and the family helps them understand it."},
+{lv:2,q:"What happens every December in the community?",ch:["A big snowstorm","The Ceremonies, where every age group moves up and Elevens get their Assignments","Everyone goes on vacation","Families switch houses"],a:1,why:"The December Ceremonies. At the Ceremony of Twelve, each new Twelve gets a lifelong job."},
+{lv:2,q:"How are families made in the community?",ch:["People fall in love and have kids","Two matched parents apply for children: one boy and one girl","Kids choose their parents","Everyone lives alone"],a:1,why:"Spouses are matched, and each family unit is assigned one boy and one girl."},
+{lv:2,q:"What is the Ceremony of Twelve?",ch:["A birthday party","When Elevens get their Assignment (their job for life)","A sports competition","A graduation from college"],a:1,why:"The Committee of Elders gives each new Twelve their Assignment."},
+{lv:2,q:"Who decides each person's Assignment?",ch:["Their parents","The person themselves","The Committee of Elders","A lottery"],a:2,why:"The Committee of Elders watches the children and picks their jobs."},
+{lv:2,q:"What does it mean to be \"released\" in the community?",ch:["Getting a day off","Being sent out of the community, forever","Getting a new bike","Being promoted"],a:1,why:"Release means leaving the community for good. It sounds gentle, but it's treated as very serious."},
+{lv:2,q:"Why is Gabe staying at Jonas's house at night?",ch:["He's Jonas's new brother","He isn't growing well, so Father is giving him extra care","His parents are on vacation","He's a Twelve now"],a:1,why:"Gabe isn't thriving at the Nurturing Center, so Father brings him home at night to help."},
+{lv:2,q:"What do Nines receive at the Ceremony?",ch:["Their Assignment","A bicycle","A comfort object","A newchild"],a:1,why:"Nines get their bicycles. Twelves get Assignments."},
+{lv:2,q:"Which is a common trait of a dystopian society?",ch:["Everyone is free to do anything","The government has extreme control and people lose freedom","There are no rules at all","Everyone is rich"],a:1,why:"Extreme government control, surveillance, propaganda and conformity are classic dystopia traits."},
+{lv:2,q:"Dystopian protagonists are usually...",ch:["Happy followers of every rule","Rebels against oppressive systems","Villains","Robots"],a:1,why:"From the exit ticket: they are rebels who question the system."},
+{lv:2,q:"Who coined the word \"utopia\"?",ch:["George Orwell","Thomas More, in 1516","Lois Lowry","H.G. Wells"],a:1,why:"Thomas More's book Utopia (1516). It meant \"no place.\""},
+{lv:2,q:"What does Jonas's community care a LOT about when people talk?",ch:["Talking loudly","Precision of language: using the exact right word","Speaking other languages","Telling jokes"],a:1,why:"That's why Jonas thinks hard before choosing \"apprehensive.\""},
+// ---- Level 3 ----
+{lv:3,q:"Why is Jonas apprehensive at the start of the book?",ch:["He lost his bike","The Ceremony of Twelve is coming and he doesn't know what his Assignment will be","He's sick","His friend moved away"],a:1,why:"His whole future job is about to be chosen, and he can't guess it."},
+{lv:3,q:"Why does the book open with Jonas remembering a plane flying over the community?",ch:["To show planes are fun","It shows how scared everyone got when something unusual happened, and the pilot was released for his mistake","Because Jonas wants to be a pilot","It's a dream"],a:1,why:"It shows fear of the unusual and harsh punishment for a mistake: two dystopia clues!"},
+{lv:3,q:"Why do authors usually set dystopias in the future?",ch:["Because the future is boring","As a warning: there's still time to make a better future","Because they hate the past","To show off technology"],a:1,why:"From the exit ticket: the message is that there's still time to change things."},
+{lv:3,q:"What is a main purpose of dystopian fiction?",ch:["To make readers sleepy","To warn readers and make them question authority and rules","To teach math","To sell toys"],a:1,why:"Cautionary warning, challenge authority, spark critical thinking, and show resilience."},
+{lv:3,q:"According to the article, what made utopias seem silly and led to dystopias?",ch:["Video games","Real events like police states and two World Wars","A lack of paper","Too many happy endings"],a:1,why:"Real-world horrors made writers imagine how societies could go wrong."},
+{lv:3,q:"Why is \"utopia\" a clever name if it means \"no place\"?",ch:["It's a typo","It suggests a perfect place can't really exist","Because it's in Greece","It means \"good food\""],a:1,why:"More was hinting that perfection is impossible."},
+{lv:3,q:"Why does the community share feelings every night?",ch:["To keep feelings small and under control, so nobody has big upsetting emotions","Because it's a game","To pick a winner","To plan vacations"],a:0,why:"The ritual helps everyone sort out feelings so they stay calm. Keep an eye on this: the community controls a lot."},
+{lv:3,q:"What does the way families are formed tell you about the community?",ch:["People have lots of choices","The community controls even very personal parts of life","Families don't matter","Kids are in charge"],a:1,why:"Matched spouses and assigned children: personal choices are made by the community. That's control!"},
+{lv:3,q:"Why might Jonas notice that Gabe has pale eyes like his?",ch:["It doesn't matter at all","Almost everyone has dark eyes, so it's unusual, a hint that it might be important later","All babies have pale eyes","Gabe is his real brother"],a:1,why:"Pale eyes are rare in the community. Authors plant details like this on purpose."},
+{lv:3,q:"Lowry describes \"release\" calmly, but people react to it with fear. What does that suggest?",ch:["Release is a fun prize","Release might be something terrible that the community hides with gentle words","People are just grumpy","Release means a vacation"],a:1,why:"Soft words for scary things is a dystopia clue: the community may be hiding the truth."},
+// ---- Level 4 ----
+{lv:4,q:"Which detail from chapters 1–2 BEST shows the community is a dystopia?",ch:["Jonas rides a bike","A pilot who made a navigation mistake was released","Lily is chatty","Jonas eats dinner with his family"],a:1,why:"Harsh punishment for a small mistake is a key dystopia trait."},
+{lv:4,q:"The community seems peaceful and perfect. Why might it actually be a dystopia?",ch:["It has too many trees","People have very little choice: jobs, spouses and children are all decided for them","The weather is bad","There's no school"],a:1,why:"It looks like a utopia on the surface, but people give up freedom for that order."},
+{lv:4,q:"Which theme is the class connecting to The Giver?",ch:["Challenging authority","Cooking at home","Space travel","Sports teamwork"],a:0,why:"The lesson is called \"Challenging Authority.\" Watch whether Jonas starts questioning the rules."},
+{lv:4,q:"Which is NOT a trait of a dystopia?",ch:["Surveillance","Conformity","Lots of individual freedom and choice","Propaganda that says everything is perfect"],a:2,why:"Dystopias take away individual freedom."},
+{lv:4,q:"Jonas thinks very carefully before choosing the word \"apprehensive.\" What does that show about the community?",ch:["They don't care about words","Precise language is expected, and even feelings are carefully labeled","Jonas can't talk","Everyone speaks a different language"],a:1,why:"Precision of language is a rule. Even feelings must be described exactly."},
+{lv:4,q:"Jonas is about to get an Assignment chosen for him. Based on how dystopian protagonists usually act, what might happen later?",ch:["He'll never think about it again","He may start to question the community's rules","He'll become the Chief Elder right away","He'll move to Zootopia"],a:1,why:"Dystopian protagonists usually question and challenge the system. That's a good prediction!"},
+{lv:4,q:"What is the shared message of most dystopian novels, from the exit ticket?",ch:["The future is hopeless","There's still time to create a better future","Rules are always good","Technology is evil"],a:1,why:"Answer B: there's still time to create a better future."},
+{lv:4,q:"Which book came first?",ch:["1984 by Orwell","Utopia by Thomas More","The Time Machine by H.G. Wells","Brave New World"],a:1,why:"Utopia (1516) came way before The Time Machine (1895), Brave New World and 1984 (1948)."},
+];
+
+const ELA_CHEAT=[
+["Due Monday 11/16","Read <b>chapters 1 and 2</b> of The Giver and answer the 5 questions in your Lesson 1 Homework doc. Use the word <b>apprehensive</b> in question 1!"],
+["Homework: where to look","Q1: the very first pages: how does Jonas feel, and what does he think about before choosing his word? Q2: the end of chapter 1, after dinner. Q3: chapter 2: what happens to each age group, and what's special about Twelve? Q4: Father's work, and the newchild he brings home. Q5: who is in each family, and how do they get there? <i>Write the answers in your own words.</i>"],
+["Utopia vs. dystopia","<b>Utopia</b> (u- = not, topos = place): an imagined perfect place. <b>Dystopia</b> (dys- = bad): an imagined society with great suffering or injustice. Thomas More coined \"utopia\" in 1516."],
+["Dystopia traits","Extreme government control, loss of freedom, censorship, surveillance, propaganda (\"everything is perfect!\"), harsh punishment for small mistakes, conformity, fear of the outside world."],
+["The dystopian hero","A rebel who questions the rules, clashes with authority, and discovers who they are. A symbol of hope, individuality and resilience."],
+["Why authors write dystopias","A <b>cautionary warning</b>, to <b>challenge authority</b>, to <b>spark critical thinking</b>, and to show <b>human resilience</b>. Set in the future because there's still time to fix things."],
+["Who's who (Ch 1–2)","<b>Jonas</b>: an Eleven, apprehensive about the Ceremony. <b>Lily</b>: his sister, a Seven. <b>Father</b>: Nurturer. <b>Mother</b>: Department of Justice. <b>Gabe</b>: newchild Father brings home at night, pale eyes like Jonas. <b>Asher</b>: best friend."],
+["How the community works","Family units: matched parents + one boy + one girl. Telling of feelings every night. December Ceremonies (Nines get bikes; Twelves get Assignments from the Committee of Elders). Precision of language. \"Release\" = sent away forever."],
+["Clues to watch for","Gentle words for scary things (\"release\"). Fear of anything unusual (the plane). Everyone's choices made for them. Pale eyes are rare. Does Jonas start to question the rules?"],
+];
+/*ELA_DATA_END*/
+$("#elacheat").innerHTML=ELA_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
 $("#sscheat").innerHTML=SS_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
 
 /* ---------- lollipop quest ---------- */
@@ -684,12 +798,16 @@ const LOSS=[0,2,10,15,20];
 // Two right in a row → harder level; a miss → easier level. So progress only goes forward on net.
 const LADDER=[[50,"🐻","Gummy bear"],[100,"🪱","Sour worm"],[150,"🍫","Chocolate"],[200,"🧁","Cupcake"],[250,"🍩","Donut"],[300,"🍭","LOLLIPOP TROPHY"]];
 const LEVELS=["","Sprinkle (easy)","Gumdrop","Jawbreaker","Mega Jawbreaker (hard)"];
-const LQ_RIGHT=["Messi: GOOOOL! What a golazo of an answer!","Messi: Top corner! Sargon is impressed.","Messi: Even Hammurabi would carve that into his code.","Messi: ¡Vamos, Remi! Write that on a clay tablet.","Messi: That's a World Cup answer right there."];
+const QUESTS={
+  ss:{bank:()=>SS_QS,key:"remi-lolly",place:"Mesopotamia",win:"Sargon conquered Sumer; you conquered Mesopotamia.",cheer:["Messi: Top corner! Sargon is impressed.","Messi: Even Hammurabi would carve that into his code.","Messi: ¡Vamos, Remi! Write that on a clay tablet."]},
+  ela:{bank:()=>ELA_QS,key:"remi-lolly-ela",place:"The Giver",win:"The Giver would give you this memory: a giant lollipop, in full color.",cheer:["Messi: Precision of language! Perfect answer.","Messi: The Committee of Elders assigns you: Champion.","Messi: ¡Vamos, Remi! You're seeing beyond."]}};
+let Q=QUESTS.ss;
+const LQ_RIGHT=["Messi: GOOOOL! What a golazo of an answer!","Messi: That's a World Cup answer right there.","Messi: Golazo!"];
 const LQ_WRONG=["Dibu dives and saves most of your points! Here's the answer:","Dibu: No pasa nada! Here's how it works:","Dibu: I've got your back. Lock this one in:"];
 const lqDuo=(m="idle",d="idle")=>{$("#lqduo").innerHTML=messi(m)+dibu(d)};
 let L;
-function lqLoad(){try{L=JSON.parse(localStorage.getItem("remi-lolly"))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.recent=[];L.redo=[];L.since=0}
-function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem("remi-lolly",JSON.stringify(k))}catch(e){}}
+function lqLoad(){L=null;try{L=JSON.parse(localStorage.getItem(Q.key))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.recent=[];L.redo=[];L.since=0}
+function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem(Q.key,JSON.stringify(k))}catch(e){}}
 function lqGoal(){return 300*(L.trophies+1)}
 function drawLq(){
   const base=300*L.trophies,p=Math.max(0,Math.min(1,(L.pts-base)/300));
@@ -701,14 +819,15 @@ function drawLq(){
   $("#lqcoupons").querySelectorAll("[data-coupon]").forEach(b=>b.onclick=()=>lqCoupon(+b.dataset.coupon));
   $("#lqsafe").textContent=L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn.";
 }
-function startLolly(){if(!L)lqLoad();drawLq();lqAsk()}
+function startLolly(id){const nq=QUESTS[id]||Q;if(nq!==Q||!L){Q=nq;lqLoad()}drawLq();lqAsk()}
 function lqPick(){
   if(L.redo.length&&L.since>=3){L.since=0;return L.redo.shift()} // missed questions come back later
-  for(const d of [0,-1,1,-2,2]){const pool=SS_QS.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q));if(pool.length)return pick(pool)}
-  L.recent=[];return pick(SS_QS);
+  const B=Q.bank();
+  for(const d of [0,-1,1,-2,2]){const pool=B.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q));if(pool.length)return pick(pool)}
+  L.recent=[];return pick(B);
 }
 function lqAsk(){
-  lqDuo();const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,SS_QS.length-4))L.recent.shift();
+  lqDuo();const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,Q.bank().length-4))L.recent.shift();
   const order=shuffle(q.ch.map((c,i)=>i)),gain=10*L.lv;
   $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">+${gain}</span>${q.q}</p>
     <div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${q.ch[i]}</button>`).join("")}</div><div id="lqafter"></div>`;
@@ -737,7 +856,7 @@ function lqTrophy(){
   L.trophies++;lqSave();addXP(50);confetti();
   $("#lqbody").innerHTML=`<div class="end"><div class="duo" aria-hidden="true">${messi("celebrate")}<div class="trophy"><div class="pop-head"></div><div class="cup">REMI</div><div class="base"></div></div>${dibu("dance")}</div>
     <h3 style="font-size:30px">You won the Lollipop Trophy${L.trophies>1?" #"+L.trophies:""}!</h3>
-    <p style="margin:0;font-weight:700">${L.pts} points. Messi and Dibu are lifting you up! Sargon conquered Sumer; you conquered Mesopotamia. Keep going for trophy #${L.trophies+1}!</p>
+    <p style="margin:0;font-weight:700">${L.pts} points. Messi and Dibu are lifting you up! ${Q.win} Keep going for trophy #${L.trophies+1}!</p>
     <div class="controls"><button class="btn lime" id="lqcash">Cash it in for a REAL lollipop!</button><button class="btn pink" id="lqmore">Keep going</button></div></div>`;
   drawLq();$("#lqmore").onclick=lqAsk;$("#lqcash").onclick=()=>lqCoupon(L.trophies);
 }
@@ -749,7 +868,7 @@ function lqCoupon(n){
   $("#lqbody").innerHTML=`<div class="end"><div class="coupon">
       <div class="coupon-top">🍭 OFFICIAL LOLLIPOP COUPON 🍭</div>
       <p class="coupon-big">Good for ONE real lollipop</p>
-      <p>Earned by <b>Remi</b> for winning Lollipop Trophy #${n} in Mesopotamia.</p>
+      <p>Earned by <b>Remi</b> for winning Lollipop Trophy #${n} in ${Q.place}.</p>
       <p class="coupon-small">Approved by Messi #10 and Dibu #23 ⚽🧤</p>
       <p class="coupon-code">${c.code}</p>
       <p class="coupon-small">Cashed in on ${c.when}. Show this to a grown-up to collect!</p>
