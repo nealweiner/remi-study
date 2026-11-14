@@ -134,6 +134,40 @@ button:focus-visible,input:focus-visible{outline:3px dashed var(--grape);outline
 .end{text-align:center;display:grid;gap:12px;justify-items:center}
 .end .big{font-size:80px}
 
+/* lollipop quest */
+.lq-top{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.pop{display:grid;justify-items:center}
+.pop-head{position:relative;width:120px;height:120px;border-radius:50%;border:4px solid var(--ink);display:grid;place-items:center;overflow:hidden;
+  background:repeating-conic-gradient(var(--pop) 0 22deg,#fff 22deg 44deg,var(--sky) 44deg 66deg,#fff 66deg 88deg)}
+.pop-mask{position:absolute;inset:0;background:conic-gradient(transparent 0 var(--p,0%),color-mix(in srgb,var(--paper) 88%,var(--ink)) var(--p,0%));transition:--p .6s}
+.pop-head span{position:relative;font-family:var(--display);font-size:28px;background:var(--paper);border:3px solid var(--ink);border-radius:99px;padding:0 10px;font-variant-numeric:tabular-nums}
+.pop-stick{width:12px;height:56px;background:#fff;border:3px solid var(--ink);border-top:none;border-radius:0 0 6px 6px}
+.pop.bump .pop-head{animation:wobble .5s}
+@keyframes wobble{25%{transform:rotate(-12deg) scale(1.08)}60%{transform:rotate(10deg)}}
+.lq-info{display:grid;gap:8px;min-width:0}
+.lq-level{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-weight:800}
+.lq-level .chip{border:3px solid var(--ink);border-radius:99px;padding:2px 10px;background:var(--paper);font-size:14px}
+.lq-level .chip.on{background:var(--sun);color:#1d1a2e}
+.ladder{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.ladder li{border:3px solid var(--ink);border-radius:12px;padding:4px 8px;font-weight:800;font-size:14px;background:var(--paper);opacity:.55}
+.ladder li.got{opacity:1;background:var(--lime);color:#1d1a2e}
+.ladder li.next{opacity:1;border-style:dashed}
+.lq-safe{margin:0;font-weight:700;color:var(--muted)}
+.delta{font-family:var(--display);font-size:22px}
+.delta.up{color:var(--good)} .delta.down{color:var(--bad)}
+.coupon{max-width:420px;width:100%;border:4px dashed var(--ink);border-radius:18px;background:var(--sun);color:#1d1a2e;padding:18px;display:grid;gap:6px;text-align:center;transform:rotate(-1.5deg);box-shadow:6px 6px 0 var(--shadow)}
+.coupon p{margin:0;font-weight:700}
+.coupon-top{font-family:var(--display);font-size:20px;letter-spacing:1px}
+.coupon-big{font-family:var(--display);font-size:clamp(24px,6vw,32px)!important;color:#c2185b}
+.coupon-code{font-family:ui-monospace,Menlo,monospace;font-size:24px!important;background:#fff;border:3px solid #1d1a2e;border-radius:10px;padding:4px 10px;justify-self:center;letter-spacing:2px}
+.coupon-small{font-size:13px}
+.trophy{display:grid;justify-items:center;gap:0}
+.trophy .pop-head{width:150px;height:150px;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+.trophy .cup{width:150px;height:90px;background:linear-gradient(90deg,#e8a900,#ffd84d,#e8a900);border:4px solid var(--ink);border-radius:0 0 70px 70px;margin-top:-6px;display:grid;place-items:center;font-family:var(--display);color:#1d1a2e;font-size:18px}
+.trophy .base{width:90px;height:22px;background:#e8a900;border:4px solid var(--ink);border-top:none}
+@media (max-width:520px){.lq-top{grid-template-columns:1fr;justify-items:center}.pop-head{width:100px;height:100px}}
+
 /* coaster */
 .coaster canvas{touch-action:pan-y;width:100%;height:auto;aspect-ratio:2/1;max-width:100%;border:3px solid var(--ink);border-radius:14px;background:var(--bg)}
 .meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
@@ -181,13 +215,13 @@ input[type=range]{width:100%;accent-color:var(--pop)}
   </header>
 
   <nav class="subjects" aria-label="Subjects">
-    <button class="subj sticker" aria-pressed="true"><b>Science</b><small>Unit 1: Forces &amp; Energy</small></button>
+    <button class="subj sticker" aria-pressed="false" data-subj="menu"><b>Science</b><small>Unit 1: Forces &amp; Energy</small></button>
+    <button class="subj sticker" aria-pressed="true" data-subj="ssmenu"><b>Social Studies</b><small>Mesopotamia</small></button>
     <button class="subj sticker" disabled><b>Math</b><small>Squirrels still building this level</small></button>
     <button class="subj sticker" disabled><b>ELA</b><small>Coming soon</small></button>
-    <button class="subj sticker" disabled><b>Social Studies</b><small>Coming soon</small></button>
   </nav>
 
-  <section id="menu" class="unit">
+  <section id="menu" class="unit" hidden>
     <h2 style="font-size:30px">Newton's Playground</h2>
     <p>Pick a game. Every right answer earns XP. Wrong answers earn nothing, but you still learn the thing, which is secretly the point.</p>
     <div class="tiles">
@@ -198,9 +232,40 @@ input[type=range]{width:100%;accent-color:var(--pop)}
     </div>
   </section>
 
+  <section id="ssmenu" class="unit">
+    <h2 style="font-size:30px">Land Between the Rivers</h2>
+    <p>Mesopotamia test on Monday, Nov 16. Climb the candy ladder to win the Lollipop Trophy.</p>
+    <div class="tiles">
+      <button class="tile sticker" data-go="lolly"><span class="big">🍭</span><h3>Lollipop Quest</h3><p>Questions get harder as you go. Every 50 points is a checkpoint you can never fall below. Reach 300 for the trophy!</p></button>
+      <button class="tile sticker" data-go="flash" data-deck="ss"><span class="big">🃏</span><h3>Brain Flex Cards</h3><p>Every Mesopotamia word and person. Say it before you flip!</p></button>
+      <button class="tile sticker" data-go="sspower"><span class="big">📜</span><h3>Cheat Sheet</h3><p>The whole unit on one page: rivers, Sumer, kings and empires.</p></button>
+    </div>
+  </section>
+
+  <!-- LOLLIPOP QUEST -->
+  <section id="lolly" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Lollipop Quest</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
+    <div class="lq-top">
+      <div class="pop" id="pop" aria-hidden="true"><div class="pop-head"><div class="pop-mask" id="popmask"></div><span id="poppts">0</span></div><div class="pop-stick"></div></div>
+      <div class="lq-info">
+        <div class="lq-level" id="lqlevel"></div>
+        <ol class="ladder" id="ladder" aria-label="Candy checkpoints"></ol>
+        <p class="lq-safe" id="lqsafe"></p>
+        <div class="controls" id="lqcoupons" style="justify-content:flex-start"></div>
+      </div>
+    </div>
+    <div id="lqbody"></div>
+  </section>
+
+  <!-- SS CHEAT SHEET -->
+  <section id="sspower" class="stage sticker" hidden>
+    <div class="stage-head"><h2>Mesopotamia Cheat Sheet</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
+    <div class="powerups" id="sscheat"></div>
+  </section>
+
   <!-- FLASHCARDS -->
   <section id="flash" class="stage sticker" hidden>
-    <div class="stage-head"><h2>Brain Flex Cards</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <div class="stage-head"><h2>Brain Flex Cards</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
     <div class="card" id="fcard" aria-live="polite"></div>
     <div class="controls" id="fctrl"></div>
     <div class="tally" id="ftally"></div>
@@ -208,13 +273,13 @@ input[type=range]{width:100%;accent-color:var(--pop)}
 
   <!-- BOSS -->
   <section id="boss" class="stage sticker" hidden>
-    <div class="stage-head"><h2>Penalty Shootout</h2><button class="btn alt" data-go="menu">Leave the stadium</button></div>
+    <div class="stage-head"><h2>Penalty Shootout</h2><button class="btn alt" data-go="home">Leave the stadium</button></div>
     <div id="bossbody"></div>
   </section>
 
   <!-- COASTER -->
   <section id="coaster" class="stage sticker coaster" hidden>
-    <div class="stage-head"><h2>Roller Coaster Lab</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <div class="stage-head"><h2>Roller Coaster Lab</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
     <canvas id="cv" width="800" height="400" aria-label="Roller coaster track with a cart"></canvas>
     <div class="sliders">
       <label for="pos">Cart position<input id="pos" type="range" min="0" max="1000" value="0"></label>
@@ -242,7 +307,7 @@ input[type=range]{width:100%;accent-color:var(--pop)}
 
   <!-- POWER-UPS -->
   <section id="power" class="stage sticker" hidden>
-    <div class="stage-head"><h2>Power-Ups</h2><button class="btn alt" data-go="menu">Back to arcade</button></div>
+    <div class="stage-head"><h2>Power-Ups</h2><button class="btn alt" data-go="home">Back to arcade</button></div>
     <div class="powerups">
       <div class="pu"><h3>Newton's 1st Law</h3><p>At rest stays at rest. Moving keeps moving (same speed, same direction) unless an outside force acts. That laziness is called <b>inertia</b>.</p></div>
       <div class="pu"><h3>Newton's 2nd Law</h3><code>F = m × a</code><p>More force means more acceleration. More mass means you NEED more force.</p></div>
@@ -277,15 +342,17 @@ function drawXP(){
   $("#xpbar").style.width=Math.min(100,(xp-lo)/(hi-lo)*100)+"%";
 }
 drawXP();
-(function(){const d=Math.ceil((new Date(2026,10,13)-new Date().setHours(0,0,0,0))/864e5);
-  $("#countdown").textContent=d>1?`Science test in ${d} days`:d===1?"Science test: TOMORROW":d===0?"Science test: TODAY. You got this":"Science test: done!";})();
+(function(){const d=Math.ceil((new Date(2026,10,16)-new Date().setHours(0,0,0,0))/864e5);
+  $("#countdown").textContent=d>1?`Mesopotamia test in ${d} days`:d===1?"Mesopotamia test: TOMORROW":d===0?"Mesopotamia test: TODAY. You got this":"Mesopotamia test: done!";})();
 
 let toastT;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>el.hidden=true,1800)}
 
 /* ---------- nav ---------- */
-const views=["menu","flash","boss","coaster","power"];
-function go(v){views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
-document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go)});
+const views=["menu","ssmenu","flash","boss","coaster","power","lolly","sspower"];
+let curMenu="ssmenu";
+function go(v,btn){if(v==="home")v=curMenu;if(v==="flash")FLASHDECK=btn?.dataset.deck==="ss"?SS_CARDS:CARDS;views.forEach(x=>$("#"+x).hidden=x!==v);if(v==="lolly")startLolly();if(v==="flash")startFlash();if(v==="boss")startBoss();if(v==="coaster")drawCoaster();window.scrollTo({top:0})}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go,b)});
+document.querySelectorAll("[data-subj]").forEach(b=>b.onclick=()=>{curMenu=b.dataset.subj;document.querySelectorAll("[data-subj]").forEach(x=>x.setAttribute("aria-pressed",x===b));go(curMenu)});
 
 /* ---------- flashcards ---------- */
 const CARDS=[
@@ -313,8 +380,8 @@ const CARDS=[
 ["Roller coaster: where is KE highest?","At the bottom of the biggest drop, where it's fastest. That's where PE is lowest."],
 ["Units roll call","Force N · mass kg · velocity m/s · acceleration m/s² · energy J · distance m."],
 ];
-let deck,fi,fFlipped,fGot,fMiss;
-function startFlash(){deck=shuffle(CARDS);fi=0;fGot=0;fMiss=[];showCard(false)}
+let deck,fi,fFlipped,fGot,fMiss,FLASHDECK;
+function startFlash(){deck=shuffle(FLASHDECK||CARDS);fi=0;fGot=0;fMiss=[];showCard(false)}
 function showCard(back){
   fFlipped=back;const c=$("#fcard"),ctl=$("#fctrl");
   if(fi>=deck.length){
@@ -461,6 +528,210 @@ function bossEnd(){
     <button class="btn pink" id="rematch">Rematch</button></div>`;
   if(won){addXP(50);confetti()}
   $("#rematch").onclick=startBoss;
+}
+
+/* ---------- social studies content ---------- */
+/*SS_DATA_START*/
+const SS_CARDS=[
+["Mesopotamia","Greek for \"the land between the rivers.\" A region (not a country) in the Middle East, mostly today's Iraq."],
+["Tigris & Euphrates","The two major rivers of Mesopotamia. They flow southeast to the Persian Gulf."],
+["Fertile Crescent","A curving strip of good farmland from the Mediterranean Sea to the Persian Gulf. Mesopotamia is its eastern part."],
+["Sumer","The first civilization in Mesopotamia, in the south, on the plain."],
+["Plateau vs. plain","Plateau: high, flat land (northern Mesopotamia). Plain: flat, open land, lower than a plateau (southern Mesopotamia, where Sumer was)."],
+["Silt","Small bits of rich soil left behind by floods. Great for farming wheat and barley."],
+["Irrigation","Watering crops with canals from a water source. Sumerians built dams, gates and canals."],
+["Surplus","Extra food. A surplus meant not everyone had to farm, so people could have specialized jobs."],
+["City-state","A city plus the villages and farmland it controlled, with its own government. Each Sumerian city-state was independent."],
+["Ziggurat","A huge temple (the word means \"to rise high\"). The top was the god's home; only special priests could go there."],
+["Polytheism","Believing in many gods. Sumerians thought the gods controlled nature, so they had to keep them happy. (Monotheism = one god.)"],
+["Ensi","A priest-king. Sumerian city-states were first ruled by priests, not kings."],
+["Monarchy","Government with one ruler, usually a king, with power passed down in the family (hereditary)."],
+["Theocratic","When gods and religion heavily influence government. Each Sumerian city-state had a theocratic monarchy."],
+["Nomads","People who move around with their herds. Nomads attacked the city-states for riches, water and land."],
+["Cuneiform","Sumerian writing: \"wedge-shaped\" marks pressed into wet clay tablets with a reed stylus. Writing was Sumer's most important contribution."],
+["Pictograph","A picture that stands for a word or idea. Sumerian writing started as pictographs."],
+["Scribe","A person who specialized in writing and record keeping."],
+["Epic","A long poem about a hero. The Epic of Gilgamesh is the world's oldest known story."],
+["Social classes","Groups with different levels of wealth, power and status. Sumer: upper (king, priests, officials), middle (merchants, farmers, artisans), lowest (enslaved people)."],
+["Artisan","A skilled craftsman."],
+["Public works","Government projects that help the whole community, like walls and canals (today: schools, roads, libraries). Stores are NOT public works."],
+["Empire","A large territory of conquered peoples joined together and ruled by one ruler."],
+["Sargon of Akkad","Born poor, overthrew the king of Kish, conquered all of Sumer in chariots. Created the FIRST EMPIRE ever and tore down city walls."],
+["Why Sargon's empire fell","City-states rebelled because they wanted independence, and invaders (the Gutians) attacked."],
+["Shamshi-Adad","King of Assyria (north). Held his empire together with BOTH conquest and trade."],
+["Hammurabi","King of Babylon (south). Conquered Mesopotamia, sent governors, judges and tax collectors everywhere, and made Hammurabi's Code."],
+["Hammurabi's Code","282 laws carved on a big stone so everyone could see them. Punishments depended on your social class."],
+["Tiglath-Pileser III","New Assyrian king who forced conquered people to move to stop rebellions. It made people hate Assyria."],
+["Nebuchadnezzar II","New Babylonian king. Built the Hanging Gardens and sent thousands of Jews into exile in Babylon."],
+["8 characteristics of civilization","Cities & geography, government & law, specialized jobs, social classes, religion, art/architecture/technology, writing & record keeping, public works."],
+["Sumerian inventions","Writing (cuneiform), the wheel, sailboat, plow, potter's wheel, bronze, a number system based on 60, and a 12-month moon calendar."],
+];
+
+// lv 1 = recall, 2 = understand, 3 = cause & effect, 4 = tricky reasoning / timelines
+const SS_QS=[
+// ---- Level 1 ----
+{lv:1,q:"What are the two major rivers of Mesopotamia?",ch:["Tigris and Euphrates","Nile and Amazon","Indus and Ganges","Jordan and Danube"],a:0,why:"The Tigris and Euphrates. Mesopotamia sits between them."},
+{lv:1,q:"What does \"Mesopotamia\" mean?",ch:["Land of the kings","Land between the rivers","Land of many gods","Desert of sand"],a:1,why:"It's Greek for \"the land between the rivers.\""},
+{lv:1,q:"What was the FIRST civilization in Mesopotamia?",ch:["Babylonia","Assyria","Sumer","Akkad"],a:2,why:"Sumer came first. Akkad, Assyria and Babylonia came later."},
+{lv:1,q:"Cuneiform writing is...",ch:["pictures painted on walls","wedge-shaped marks pressed into clay","an alphabet of 22 letters","knots tied in rope"],a:1,why:"Cuneiform means \"wedge-shaped.\" Scribes pressed a reed stylus into wet clay tablets."},
+{lv:1,q:"A ziggurat was a...",ch:["giant temple","kind of boat","city wall","farming tool"],a:0,why:"A huge temple that rose high. The top was the home of the city's god."},
+{lv:1,q:"Believing in many gods is called...",ch:["monotheism","monarchy","polytheism","theocracy"],a:2,why:"Poly = many. Sumerians were polytheistic. Monotheism = one god."},
+{lv:1,q:"Who created the world's first empire?",ch:["Hammurabi","Sargon of Akkad","Gilgamesh","Nebuchadnezzar"],a:1,why:"Sargon of Akkad conquered all the Sumerian city-states and united them."},
+{lv:1,q:"Hammurabi is most famous for...",ch:["inventing the wheel","building the Hanging Gardens","his code of laws","writing the Epic of Gilgamesh"],a:2,why:"Hammurabi's Code: 282 laws carved on a big stone."},
+{lv:1,q:"A person whose job was writing and record keeping was a...",ch:["scribe","nomad","artisan","ensi"],a:0,why:"Scribes were the record keepers."},
+{lv:1,q:"Watering crops using canals from a river is called...",ch:["silt","surplus","irrigation","erosion"],a:2,why:"Irrigation. The Sumerians built dams, gates and canals."},
+{lv:1,q:"The rich soil that floods left behind is called...",ch:["silt","clay","bronze","lapis lazuli"],a:0,why:"Silt. It made the land great for farming wheat and barley."},
+{lv:1,q:"Extra food that isn't needed right away is a...",ch:["famine","surplus","tribute","harvest tax"],a:1,why:"A surplus. It let some people stop farming and do other jobs."},
+{lv:1,q:"What did Sumerians build their walls and houses out of?",ch:["Stone blocks","Wood logs","Mud brick","Iron"],a:2,why:"Mud bricks dried in the sun. Stone and wood were scarce."},
+{lv:1,q:"What is the world's oldest known story?",ch:["The Odyssey","The Epic of Gilgamesh","Hammurabi's Code","The Standard of Ur"],a:1,why:"The Epic of Gilgamesh, about a king of Uruk."},
+{lv:1,q:"Which of these did the Sumerians invent?",ch:["The wheel","Paper","Gunpowder","The printing press"],a:0,why:"The wheel, around 3500 BC. Also the plow, sailboat and potter's wheel."},
+{lv:1,q:"Mesopotamia is in which part of the world?",ch:["South America","The Middle East","East Asia","Northern Europe"],a:1,why:"The Middle East, mostly today's Iraq."},
+{lv:1,q:"A city plus the villages and farms it controls, with its own government, is a...",ch:["empire","city-state","plateau","province"],a:1,why:"A city-state. Each one in Sumer was independent."},
+// ---- Level 2 ----
+{lv:2,q:"Why were rivers so important for starting a civilization?",ch:["They kept enemies away completely","They gave fresh water for drinking, cleaning and especially farming","They were full of gold","They made the weather cooler"],a:1,why:"Rivers gave fresh water, especially for farming. Irrigation connected rivers to farmland."},
+{lv:2,q:"How did the Sumerians deal with floods and dry land?",ch:["They moved away every spring","They built irrigation: dams, gates, canals and storage ponds","They prayed and did nothing else","They only farmed in winter"],a:1,why:"Irrigation controlled the water and turned dry land into a fertile plain."},
+{lv:2,q:"Why was each Sumerian city-state independent?",ch:["A king ordered it","Mudflats and desert made travel and communication hard","They spoke totally different languages","They were on different continents"],a:1,why:"Geography cut the cities off from each other, so each had its own government."},
+{lv:2,q:"Why did military leaders become kings in Sumer?",ch:["Priests got tired of ruling","Nomads and other city-states kept attacking, so cities needed strong military leaders","Kings were elected by vote","The gods appeared and picked them"],a:1,why:"Lots of war meant cities needed full-time military leaders, who became kings."},
+{lv:2,q:"Who ruled the Sumerian city-states FIRST?",ch:["Kings","Priests (priest-kings called ensi)","Merchants","Scribes"],a:1,why:"Priests ruled first. Kings came later because of war."},
+{lv:2,q:"Who was in the LOWEST social class in Sumer?",ch:["Farmers","Merchants","Enslaved people","Artisans"],a:2,why:"Enslaved people, mostly prisoners of war. They could still do business and even buy their freedom."},
+{lv:2,q:"Which group was in the UPPER class in Sumer?",ch:["Farmers and fishers","The king, priests and government officials","Artisans","Enslaved people"],a:1,why:"The king, priests, officials and wealthy landowners were at the top."},
+{lv:2,q:"Northern Mesopotamia was a plateau. Southern Mesopotamia (Sumer) was a...",ch:["mountain range","plain","peninsula","rainforest"],a:1,why:"A plain: flat, open land lower than the plateau."},
+{lv:2,q:"Which best describes an empire?",ch:["A city surrounded by a wall","A large territory of conquered peoples ruled by one ruler","A group of rulers sharing power","Land surrounded by water on three sides"],a:1,why:"An empire joins conquered peoples together under one ruler."},
+{lv:2,q:"Why did Sargon tear down the city walls?",ch:["To get bricks for his palace","To show each city was now part of his one kingdom","Because of an earthquake","To make room for farms"],a:1,why:"No more walls meant no more independent city-states. They were all his now."},
+{lv:2,q:"We still use a 60-minute hour because of...",ch:["the Egyptians","the Sumerian number system based on 60","the Romans","Hammurabi's Code"],a:1,why:"The Sumerians counted in 60s. That gives us 60 minutes, 60 seconds and 360 degrees."},
+{lv:2,q:"\"Theocratic\" government means...",ch:["the army runs everything","religion and the gods heavily influence government","the people vote","there's no government"],a:1,why:"Sumerian kings said their power came from the city's god."},
+{lv:2,q:"Which one is a PUBLIC WORK?",ch:["A city canal","A private house","A clothing store","A market stall"],a:0,why:"Public works help the whole community, like canals and walls. Stores are not public works."},
+{lv:2,q:"Why did the Sumerians invent writing?",ch:["To write fun stories only","To keep records of trade, food storage, laws and contracts","To send emails","Because the gods required it"],a:1,why:"Record keeping! Trade and stored grain needed tracking."},
+{lv:2,q:"What made the Fertile Crescent such a good place to settle?",ch:["Gold mines","Good farmland near rivers","Lots of forests and stone","Snowy weather"],a:1,why:"It was a strip of fertile farmland from the Mediterranean to the Persian Gulf."},
+{lv:2,q:"Each Sumerian city-state had its own...",ch:["god and government","alphabet","ocean","emperor over all of Sumer"],a:0,why:"Each city-state had its own patron god and was independent."},
+{lv:2,q:"Which is NOT one of the 8 characteristics of civilization?",ch:["Writing & record keeping","Social classes","Public works","Video games"],a:3,why:"The 8: cities & geography, government & law, specialized jobs, social classes, religion, art/architecture/technology, writing, public works."},
+// ---- Level 3 ----
+{lv:3,q:"Put the chain in order: how did irrigation lead to civilization?",ch:["Cities → irrigation → surplus → farming","Irrigation → surplus → specialized jobs → cities grow","Surplus → irrigation → nomads → writing","Writing → irrigation → kings → surplus"],a:1,why:"Irrigation made more food (surplus), so not everyone had to farm. People specialized, trade grew, and villages became cities."},
+{lv:3,q:"Why did Sargon's empire fall apart?",ch:["A flood destroyed Akkad","City-states rebelled for independence and the Gutians invaded","Sargon gave it away","The people moved to Egypt"],a:1,why:"Rebellions from inside plus invasions from outside (the Gutians)."},
+{lv:3,q:"How did Shamshi-Adad hold his empire together?",ch:["Only with force","With both conquest AND trade","Only by building ziggurats","By letting each city be independent"],a:1,why:"He used his army, but also traded (cloth for tin, copper and silver)."},
+{lv:3,q:"How did Hammurabi keep tight control of his huge empire?",ch:["He visited every city himself each day","He sent governors, judges, tax collectors and commanders everywhere","He let the priests run everything","He built walls around every city"],a:1,why:"He ran a strong central government with officials in all his lands."},
+{lv:3,q:"Why was Hammurabi's Code carved on a giant stone in public?",ch:["So everyone could know the laws and rulers couldn't make up punishments","To decorate the palace","Because paper hadn't been invented, so it didn't matter","To hide the laws from enemies"],a:0,why:"Public laws meant people knew the rules ahead of time."},
+{lv:3,q:"Under Hammurabi's Code, the punishment for a crime...",ch:["was the same for everyone","depended on the social class of the people involved","was always a fine","was decided by a coin toss"],a:1,why:"Hurting a freeman could cost you your eye; hurting a commoner meant paying silver."},
+{lv:3,q:"Tiglath-Pileser III forced conquered people to move away. What happened?",ch:["Everyone loved Assyria","It stopped some rebellions but made people hate Assyria","The people became Assyrian kings","Nothing changed"],a:1,why:"It worked short-term, but the hatred helped bring Assyria down later."},
+{lv:3,q:"Who overthrew the New Assyrian Empire in 612 BC?",ch:["The Gutians","The Chaldeans (Babylonians) and the Medes","Sargon","The Egyptians alone"],a:1,why:"The Chaldeans teamed up with the Medes."},
+{lv:3,q:"Which was Nebuchadnezzar II known for?",ch:["Creating the first empire","The Hanging Gardens of Babylon and exiling the Jews to Babylon","Inventing cuneiform","Writing 282 laws"],a:1,why:"He built Babylon up, including the Hanging Gardens, but conquered Jerusalem and sent thousands into exile."},
+{lv:3,q:"Why did Sumerians trade with faraway places?",ch:["They had too much stone and wood","Sumer lacked stone, wood and metal, so they traded grain and cloth for them","They wanted to learn Greek","Trade was required by the gods"],a:1,why:"Few natural resources meant trade was a must."},
+{lv:3,q:"Why did the Phoenicians invent an alphabet?",ch:["Cuneiform was too complicated for trade","They hated clay","Hammurabi ordered it","To write the Epic of Gilgamesh"],a:0,why:"22 sound symbols was way easier than hundreds of cuneiform signs."},
+{lv:3,q:"Why did the Sumerians believe they had to please the gods?",ch:["The gods paid them","They believed the gods controlled nature: rain, wind, floods and drought","The king said so for fun","To win wars against Egypt"],a:1,why:"If the gods were angry, crops could fail. So people gave offerings at the temple."},
+{lv:3,q:"Sumer's spring floods were a problem because...",ch:["they came at unpredictable times and could kill young crops","they brought sharks","they froze into ice","they never came at all"],a:0,why:"Floods were unpredictable. Irrigation and storage ponds helped control them."},
+{lv:3,q:"How did surplus food help create social classes?",ch:["Everyone got exactly the same amount","Some people did specialized jobs and gained more wealth and power than others","It made everyone a farmer","It ended trade"],a:1,why:"With specialized jobs, some people became richer and more powerful, so classes formed."},
+{lv:3,q:"Why did both the New Assyrian and New Babylonian empires fall?",ch:["They were too kind","They drained conquered lands with taxes and did little for the people they ruled","They ran out of rivers","They never had armies"],a:1,why:"Conquered people resented them, so the empires lost support."},
+// ---- Level 4 ----
+{lv:4,q:"Which happened FIRST?",ch:["Hammurabi's Code (1792 BC)","Sargon's empire (2334 BC)","Writing and the wheel (c. 3500 BC)","Nebuchadnezzar's rule (605 BC)"],a:2,why:"In BC, bigger numbers are EARLIER. 3500 BC comes before 2334, 1792 and 605 BC."},
+{lv:4,q:"Put these in time order (earliest first).",ch:["Akkad → Sumer → Babylonia (Hammurabi) → New Assyria","Sumer → Akkad → Babylonia (Hammurabi) → New Assyria → New Babylonia","Babylonia → Sumer → Akkad → Persia","Sumer → New Babylonia → Akkad → Assyria"],a:1,why:"Sumer → Sargon's Akkad → Hammurabi's Babylonia → New Assyria → New Babylonia → then Persia (Cyrus) took over."},
+{lv:4,q:"Sargon began ruling in 2334 BC and Hammurabi in 1792 BC. About how many years apart?",ch:["542 years","4,126 years","1,792 years","54 years"],a:0,why:"In BC you subtract: 2334 − 1792 = 542 years. Sargon came first."},
+{lv:4,q:"Which statement about Sumerian government is FALSE?",ch:["It was heavily connected to religion","It was first ruled by kings, and later shifted to priests","Kings said their power came from the gods","Kingship became hereditary"],a:1,why:"It's backwards! Priests ruled FIRST, and kings came later because of war."},
+{lv:4,q:"Which is NOT an empire?",ch:["Sargon's Akkad","Hammurabi's Babylonia","A single independent Sumerian city-state","New Assyria"],a:2,why:"One independent city-state isn't an empire. An empire joins many conquered peoples under one ruler."},
+{lv:4,q:"Which evidence best supports: \"Sargon changed the way Mesopotamia was governed\"?",ch:["Sargon rode in chariots","He united the independent city-states under one ruler and tore down their walls","He was born to a poor family","Sumerians invented the wheel"],a:1,why:"The claim is about government. Going from independent city-states to one ruler is the change."},
+{lv:4,q:"\"An empire's military strength can become its greatest weakness.\" Which example fits best?",ch:["Hammurabi carved his laws in stone","Assyria's cruel army and forced moves made conquered people hate them, and they helped overthrow Assyria","Sumerians built ziggurats","Sargon tore down walls"],a:1,why:"Assyria's harsh military rule created enemies, and the Chaldeans and Medes brought it down in 612 BC."},
+{lv:4,q:"A classmate says: \"Hammurabi's Code treated everyone equally.\" What's the best response?",ch:["True, it had one rule for all","Not true: punishments depended on your social class","True, because it was carved in stone","Not true: it had no punishments"],a:1,why:"Public laws, yes, but not equal ones. A freeman's eye counted more than a commoner's."},
+{lv:4,q:"Which claim does this evidence support? \"Shamshi-Adad traded fine cloth for tin, copper and silver, AND had a huge army.\"",ch:["Shamshi-Adad succeeded by using both conquest and trade","Shamshi-Adad invented writing","Shamshi-Adad created the first empire","Shamshi-Adad wrote 282 laws"],a:0,why:"Trade plus army = conquest AND trade. That's the matching claim."},
+{lv:4,q:"In a CER paragraph, what is the Reasoning?",ch:["A statement that can be argued","A quote from the textbook with a page number","The explanation of HOW the evidence proves the claim","The title"],a:2,why:"Claim = what you argue. Evidence = facts with page numbers. Reasoning = connecting the evidence to the claim."},
+{lv:4,q:"Which is the BEST reason Mesopotamia is called a \"cradle of civilization\"?",ch:["It had the biggest army","Many firsts started there: cities, writing, the wheel, written laws and the first empire","It was the coldest place","It had no rivers"],a:1,why:"So many civilization \"firsts\" were born there."},
+{lv:4,q:"A city-state has a temple, a surplus of grain, scribes, and canals built by the government. Which characteristic of civilization do the CANALS show?",ch:["Writing","Public works","Social classes","Religion"],a:1,why:"Canals built by the government for everyone are public works. (Scribes = writing; temple = religion.)"},
+{lv:4,q:"Why might the city-states rebel against Sargon even though his empire made them stronger together?",ch:["They wanted to be independent again, like they always had been","They wanted more walls taken down","They loved the Gutians","They wanted to move to Egypt"],a:0,why:"City-states had always ruled themselves, so they never fully accepted one central ruler."},
+{lv:4,q:"Which is the correct order for how writing developed?",ch:["Alphabet → cuneiform → pictographs","Pictographs → symbols for sounds → cuneiform → (later) Phoenician alphabet","Cuneiform → pictographs → alphabet","Alphabet → pictographs → cuneiform"],a:1,why:"Pictures first, then symbols for sounds, then wedge-shaped cuneiform. The Phoenicians made the alphabet much later."},
+{lv:4,q:"Which one is NOT a reason kings gained power over priests?",ch:["Nomads attacked the cities","City-states fought each other","Cities needed full-time military leaders","The priests invented the wheel and retired"],a:3,why:"Kings rose because of war and attacks. The wheel had nothing to do with it."},
+];
+
+const SS_CHEAT=[
+["Geography","Mesopotamia = \"land between the rivers\" (Greek): the <b>Tigris</b> and <b>Euphrates</b>, flowing to the Persian Gulf. Part of the <b>Fertile Crescent</b>. North = plateau, south = plain (Sumer). Hard parts: hot, little rain, few stone or trees, surprise floods. Fixes: <b>irrigation</b> (dams, gates, canals), ponds, and rich <b>silt</b>."],
+["How civilization began","Irrigation → <b>surplus</b> food → not everyone farms → <b>specialized jobs</b> → trade grows → villages become <b>cities</b>. First civilization: <b>Sumer</b> (c. 4500–1900 BC)."],
+["City-states","A city plus its villages and farms, with its own government and its own god. Independent because mudflats and desert cut them off. Mud-brick walls. They often fought each other. Cities: Ur, Uruk, Kish, Lagash."],
+["Religion & government","<b>Polytheism</b> (many gods; they control nature). The <b>ziggurat</b> temple was the god's home. Priests (<b>ensi</b>) ruled first. War with nomads led to military leaders becoming <b>kings</b>, with power \"from the gods\" and passed down (<b>monarchy</b>). That's a <b>theocratic monarchy</b>."],
+["Social classes","Upper: king, priests, officials, rich landowners. Middle (biggest): merchants, farmers, artisans. Lowest: enslaved people (mostly prisoners of war; could buy freedom)."],
+["Inventions","<b>Cuneiform</b> (wedge-shaped, stylus on clay; started as pictographs; for record keeping), the <b>wheel</b> (c. 3500 BC), sailboat, plow, potter's wheel, bronze, math based on <b>60</b> (60-minute hour), 12-month moon calendar, the <b>Epic of Gilgamesh</b>."],
+["Sargon of Akkad (c. 2334 BC)","Born poor, overthrew the king of Kish, conquered all of Sumer: the <b>first empire</b>. Tore down city walls. Fell because city-states <b>rebelled</b> and the <b>Gutians</b> invaded."],
+["Assyria vs. Babylonia","<b>Shamshi-Adad</b> (Assyria, north): conquest <i>and</i> trade. <b>Hammurabi</b> (Babylon, south, 1792 BC): sent governors, judges and tax collectors; <b>Hammurabi's Code</b> of 282 public laws, punishments by social class. Later the Hittites and Kassites invaded."],
+["New empires","<b>Tiglath-Pileser III</b> (New Assyria): forced conquered people to move, so people hated Assyria. Chaldeans + Medes overthrew Assyria in <b>612 BC</b>. <b>Nebuchadnezzar II</b> (New Babylonia): Hanging Gardens, exiled the Jews. <b>Cyrus</b> of Persia took over in 539 BC."],
+["8 characteristics of civilization","1 Cities & geography · 2 Government & law · 3 Specialized jobs · 4 Social classes · 5 Religion · 6 Art, architecture & technology · 7 Writing & record keeping · 8 Public works"],
+["BC timeline trick","In BC, <b>bigger number = longer ago</b>. 3500 BC (writing, wheel) → 2334 BC (Sargon) → 1792 BC (Hammurabi) → 612 BC (Assyria falls) → 539 BC (Persia). To find years between two BC dates, subtract."],
+["CER paragraphs","<b>Claim</b>: something you can argue. <b>Evidence</b>: at least 2 facts with page numbers. <b>Reasoning</b>: explain how the evidence proves the claim. Don't just drop in a quote!"],
+];
+/*SS_DATA_END*/
+$("#sscheat").innerHTML=SS_CHEAT.map(([h,b])=>`<div class="pu"><h3>${h}</h3><p>${b}</p></div>`).join("");
+
+/* ---------- lollipop quest ---------- */
+// Points: right = +10 × level, wrong costs LOSS[level] (always less than a right answer earns), never below the last 50-point checkpoint.
+const LOSS=[0,2,10,15,20];
+// Two right in a row → harder level; a miss → easier level. So progress only goes forward on net.
+const LADDER=[[50,"🐻","Gummy bear"],[100,"🪱","Sour worm"],[150,"🍫","Chocolate"],[200,"🧁","Cupcake"],[250,"🍩","Donut"],[300,"🍭","LOLLIPOP TROPHY"]];
+const LEVELS=["","Sprinkle (easy)","Gumdrop","Jawbreaker","Mega Jawbreaker (hard)"];
+const LQ_RIGHT=["Sweet!","Nailed it! Hammurabi would put that in his code.","Correct! Sargon is impressed.","Yes! Write that on a clay tablet.","Big brain, Mesopotamian edition."];
+const LQ_WRONG=["Not quite, but you're safe. Here's the answer:","Oops! No worries, here's how it works:","Close! Let's lock it in:"];
+let L;
+function lqLoad(){try{L=JSON.parse(localStorage.getItem("remi-lolly"))}catch(e){}L=L||{pts:0,ckpt:0,lv:1,streak:0,trophies:0};L.recent=[];L.redo=[];L.since=0}
+function lqSave(){/* cashed coupons persist too */try{const{recent,redo,since,...k}=L;localStorage.setItem("remi-lolly",JSON.stringify(k))}catch(e){}}
+function lqGoal(){return 300*(L.trophies+1)}
+function drawLq(){
+  const base=300*L.trophies,p=Math.max(0,Math.min(1,(L.pts-base)/300));
+  $("#popmask").style.setProperty("--p",(p*100).toFixed(1)+"%");$("#poppts").textContent=L.pts;
+  $("#lqlevel").innerHTML="Level: "+[1,2,3,4].map(i=>`<span class="chip ${i===L.lv?"on":""}">${LEVELS[i]}</span>`).join("");
+  $("#ladder").innerHTML=LADDER.map(([n,e,name],i)=>{const v=base+n,got=L.pts>=v,nxt=!got&&(i===0||L.pts>=base+LADDER[i-1][0]);
+    return `<li class="${got?"got":nxt?"next":""}">${e} ${v}${n===300?" "+name:""}</li>`}).join("");
+  $("#lqcoupons").innerHTML=Array.from({length:L.trophies},(_,i)=>i+1).map(n=>`<button class="btn ${L.cashed?.[n]?"alt":"lime"}" data-coupon="${n}">🍭 Trophy #${n}: ${L.cashed?.[n]?"view coupon":"cash in!"}</button>`).join("");
+  $("#lqcoupons").querySelectorAll("[data-coupon]").forEach(b=>b.onclick=()=>lqCoupon(+b.dataset.coupon));
+  $("#lqsafe").textContent=L.ckpt>0?`Checkpoint saved at ${L.ckpt}. Your points can never drop below that.`:"Wrong answers cost less than right answers earn, and you get an easier question next.";
+}
+function startLolly(){if(!L)lqLoad();drawLq();lqAsk()}
+function lqPick(){
+  if(L.redo.length&&L.since>=3){L.since=0;return L.redo.shift()} // missed questions come back later
+  for(const d of [0,-1,1,-2,2]){const pool=SS_QS.filter(q=>q.lv===L.lv+d&&!L.recent.includes(q));if(pool.length)return pick(pool)}
+  L.recent=[];return pick(SS_QS);
+}
+function lqAsk(){
+  const q=lqPick();L.recent.push(q);if(L.recent.length>Math.min(25,SS_QS.length-4))L.recent.shift();
+  const order=shuffle(q.ch.map((c,i)=>i)),gain=10*L.lv;
+  $("#lqbody").innerHTML=`<p class="q"><span class="chip" style="border:2px solid var(--ink);border-radius:99px;padding:0 8px;font-size:13px;margin-right:6px">+${gain}</span>${q.q}</p>
+    <div class="choices">${order.map(i=>`<button class="choice" data-i="${i}">${q.ch[i]}</button>`).join("")}</div><div id="lqafter"></div>`;
+  $("#lqbody").querySelectorAll(".choice").forEach(b=>b.onclick=()=>lqAnswer(q,+b.dataset.i===q.a,b));
+}
+function lqAnswer(q,ok,btn){
+  $("#lqbody").querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(+b.dataset.i===q.a)b.classList.add("right")});
+  const lv=L.lv,before=L.pts;let msg,note="";L.since++;
+  if(ok){L.pts+=10*lv;L.streak++;msg=pick(LQ_RIGHT);addXP(5);
+    if(L.streak>=2&&L.lv<4){L.lv++;L.streak=0;note=`Level up! Next questions are ${LEVELS[L.lv]}.`}}
+  else{btn.classList.add("wrong");L.pts=Math.max(L.ckpt,L.pts-LOSS[lv]);L.streak=0;msg=pick(LQ_WRONG);if(!L.redo.includes(q))L.redo.push(q);
+    if(L.lv>1){L.lv--;note="Next one is a little easier. You've got this."}}
+  const newCk=Math.floor(L.pts/50)*50;let ckMsg="";
+  if(newCk>L.ckpt){L.ckpt=newCk;const c=LADDER.find(([n])=>n===newCk-300*L.trophies);if(c&&c[0]<300)ckMsg=`Checkpoint! You earned a ${c[2]} ${c[1]}. Points can't drop below ${newCk} now.`}
+  const won=L.pts>=lqGoal();lqSave();
+  const d=L.pts-before;
+  $("#pop").classList.remove("bump");void $("#pop").offsetWidth;if(ok)$("#pop").classList.add("bump");
+  drawLq();
+  $("#lqafter").innerHTML=`<div class="explain"><b>${msg} <span class="delta ${d>=0?"up":"down"}">${d>0?"+"+d:d<0?d:"±0 (checkpoint saved you!)"}</span></b>${q.why}${note?`<br><i>${note}</i>`:""}${ckMsg?`<br><b style="font-size:17px">${ckMsg}</b>`:""}</div>
+    <div class="controls" style="margin-top:12px"><button class="btn sun" id="lqnext">${won?"Claim your trophy!":"Next question"}</button></div>`;
+  $("#lqnext").focus();$("#lqnext").onclick=won?lqTrophy:lqAsk;
+}
+function lqTrophy(){
+  L.trophies++;lqSave();addXP(50);confetti();
+  $("#lqbody").innerHTML=`<div class="end"><div class="trophy" aria-hidden="true"><div class="pop-head"></div><div class="cup">REMI</div><div class="base"></div></div>
+    <h3 style="font-size:30px">You won the Lollipop Trophy${L.trophies>1?" #"+L.trophies:""}!</h3>
+    <p style="margin:0;font-weight:700">${L.pts} points. Sargon conquered Sumer; you conquered Mesopotamia. Keep going for trophy #${L.trophies+1}!</p>
+    <div class="controls"><button class="btn lime" id="lqcash">Cash it in for a REAL lollipop!</button><button class="btn pink" id="lqmore">Keep going</button></div></div>`;
+  drawLq();$("#lqmore").onclick=lqAsk;$("#lqcash").onclick=()=>lqCoupon(L.trophies);
+}
+function lqCoupon(n){
+  L.cashed=L.cashed||{};
+  const first=!L.cashed[n];
+  if(first){const d=new Date();L.cashed[n]={when:d.toLocaleString([], {weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}),code:"POP-"+n+"-"+Math.random().toString(36).slice(2,6).toUpperCase()};lqSave()}
+  const c=L.cashed[n];
+  $("#lqbody").innerHTML=`<div class="end"><div class="coupon">
+      <div class="coupon-top">🍭 OFFICIAL LOLLIPOP COUPON 🍭</div>
+      <p class="coupon-big">Good for ONE real lollipop</p>
+      <p>Earned by <b>Remi</b> for winning Lollipop Trophy #${n} in Mesopotamia.</p>
+      <p class="coupon-code">${c.code}</p>
+      <p class="coupon-small">Cashed in on ${c.when}. Show this to a grown-up to collect!</p>
+    </div>
+    ${first?"":`<p style="margin:0;font-weight:700">This trophy was already cashed in. Win another trophy for another lollipop!</p>`}
+    <button class="btn pink" id="lqmore">Back to the quest</button></div>`;
+  if(first)confetti();drawLq();
+  $("#lqmore").onclick=lqAsk;
 }
 
 /* ---------- coaster ---------- */
